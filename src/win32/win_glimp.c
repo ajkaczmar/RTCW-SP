@@ -979,6 +979,7 @@ static void GLW_InitExtensions( void ) {
 	glConfig.textureEnvAddAvailable = qfalse;
 	qglMultiTexCoord2fARB = NULL;
 	qglActiveTextureARB = NULL;
+	qglActiveTexture = NULL;
 	qglClientActiveTextureARB = NULL;
 	qglLockArraysEXT = NULL;
 	qglUnlockArraysEXT = NULL;
@@ -1060,9 +1061,10 @@ static void GLW_InitExtensions( void ) {
 		if ( r_ext_multitexture->integer ) {
 			qglMultiTexCoord2fARB = ( PFNGLMULTITEXCOORD2FARBPROC ) qwglGetProcAddress( "glMultiTexCoord2fARB" );
 			qglActiveTextureARB = ( PFNGLACTIVETEXTUREARBPROC ) qwglGetProcAddress( "glActiveTextureARB" );
+			qglActiveTexture = (PFNGLACTIVETEXTUREARBPROC)qwglGetProcAddress("glActiveTexture");
 			qglClientActiveTextureARB = ( PFNGLCLIENTACTIVETEXTUREARBPROC ) qwglGetProcAddress( "glClientActiveTextureARB" );
 
-			if ( qglActiveTextureARB ) {
+			if ( qglActiveTexture ) {
 				qglGetIntegerv( GL_MAX_ACTIVE_TEXTURES_ARB, &glConfig.maxActiveTextures );
 
 				if ( glConfig.maxActiveTextures > 1 ) {
@@ -1071,6 +1073,7 @@ static void GLW_InitExtensions( void ) {
 				{
 					qglMultiTexCoord2fARB = NULL;
 					qglActiveTextureARB = NULL;
+					qglActiveTexture = NULL;
 					qglClientActiveTextureARB = NULL;
 					ri.Printf( PRINT_ALL, "...not using GL_ARB_multitexture, < 2 texture units\n" );
 				}

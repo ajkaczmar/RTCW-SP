@@ -208,7 +208,8 @@ cvar_t  *r_maxpolyverts;
 int max_polyverts;
 
 void ( APIENTRY * qglMultiTexCoord2fARB )( GLenum texture, GLfloat s, GLfloat t );
-void ( APIENTRY * qglActiveTextureARB )( GLenum texture );
+void ( APIENTRY * qglActiveTextureARB ) ( GLenum texture );
+void ( APIENTRY * qglActiveTexture) (GLenum texture);
 void ( APIENTRY * qglClientActiveTextureARB )( GLenum texture );
 
 void ( APIENTRY * qglLockArraysEXT )( GLint, GLint );
@@ -759,7 +760,7 @@ void GL_SetDefaultState( void ) {
 
 	// initialize downstream texture unit if we're running
 	// in a multitexture environment
-	if ( qglActiveTextureARB ) {
+	if ( qglActiveTexture ) {
 		GL_SelectTexture( 1 );
 		GL_TextureMode( r_textureMode->string );
 		GL_TexEnv( GL_MODULATE );

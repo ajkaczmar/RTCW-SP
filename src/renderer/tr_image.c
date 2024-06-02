@@ -908,7 +908,8 @@ image_t *R_CreateImageExt( const char *name, const byte *pic, int width, int hei
 	// Ridah
 	image = tr.images[tr.numImages] = R_CacheImageAlloc( sizeof( image_t ) );
 
-	image->texnum = 1024 + tr.numImages;
+	qglGenTextures(1, &image->texnum);
+	//image->texnum = 1024 + tr.numImages;
 
 	// Ridah
 	if ( r_cacheShaders->integer ) {
@@ -928,13 +929,13 @@ image_t *R_CreateImageExt( const char *name, const byte *pic, int width, int hei
 	image->wrapClampMode = glWrapClampMode;
 
 	// lightmaps are always allocated on TMU 1
-	if ( qglActiveTextureARB && isLightmap ) {
+	if ( qglActiveTexture && isLightmap ) {
 		image->TMU = 1;
 	} else {
 		image->TMU = 0;
 	}
 
-	if ( qglActiveTextureARB ) {
+	if ( qglActiveTexture ) {
 		GL_SelectTexture( image->TMU );
 	}
 
@@ -2446,7 +2447,7 @@ void R_DeleteTextures( void ) {
 
 	memset( glState.currenttextures, 0, sizeof( glState.currenttextures ) );
 	if ( qglBindTexture ) {
-		if ( qglActiveTextureARB ) {
+		if ( qglActiveTexture ) {
 			GL_SelectTexture( 1 );
 			qglBindTexture( GL_TEXTURE_2D, 0 );
 			GL_SelectTexture( 0 );
@@ -3519,7 +3520,7 @@ void R_PurgeImage( image_t *image ) {
 
 	memset( glState.currenttextures, 0, sizeof( glState.currenttextures ) );
 	if ( qglBindTexture ) {
-		if ( qglActiveTextureARB ) {
+		if ( qglActiveTexture ) {
 			GL_SelectTexture( 1 );
 			qglBindTexture( GL_TEXTURE_2D, 0 );
 			GL_SelectTexture( 0 );
@@ -3597,7 +3598,7 @@ void R_BackupImages( void ) {
 
 	memset( glState.currenttextures, 0, sizeof( glState.currenttextures ) );
 	if ( qglBindTexture ) {
-		if ( qglActiveTextureARB ) {
+		if ( qglActiveTexture ) {
 			GL_SelectTexture( 1 );
 			qglBindTexture( GL_TEXTURE_2D, 0 );
 			GL_SelectTexture( 0 );

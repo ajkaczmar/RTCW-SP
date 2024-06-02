@@ -3564,7 +3564,6 @@ GLuint R_CompileTessShader() {
 	qglUseProgram(ID);
 	tr.glsl_tess_view = qglGetUniformLocation(ID, "view");
 	tr.glsl_tess_projection = qglGetUniformLocation(ID, "projection");
-	//tr.glsl_tess_tex1 = qglGetUniformLocation(ID, "texture1");
 
 	qglUseProgram(0);
 

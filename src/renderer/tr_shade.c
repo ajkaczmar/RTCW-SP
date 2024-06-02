@@ -368,7 +368,7 @@ static void DrawGLSL_Tess(int stage, int vbo, int numIndexes) {
 	//
 	// base
 	//
-	qglActiveTextureARB(GL_TEXTURE0_ARB);
+	qglActiveTexture(GL_TEXTURE0);
 	GL_SelectTexture(0);
 	R_BindAnimatedImage(&pStage->bundle[0]);
 
@@ -405,7 +405,7 @@ void DrawGLSL_RED(int stage, int vbo, int numIndexes) {
 	//
 	// base
 	//
-	qglActiveTextureARB(GL_TEXTURE0_ARB);
+	qglActiveTexture(GL_TEXTURE0);
 	GL_SelectTexture(0);
 	R_BindAnimatedImage(&pStage->bundle[0]);
 
@@ -443,9 +443,13 @@ void DrawGLSL_VBO(int stage, int vbo, int numIndexes) {
 	//
 	// base
 	//
-	qglActiveTextureARB(GL_TEXTURE0_ARB);
+	qglActiveTexture(GL_TEXTURE0);
 	GL_SelectTexture(0);
-	R_BindAnimatedImage(&pStage->bundle[0]);
+	qglBindTexture(GL_TEXTURE_2D, pStage->bundle[0].image[0]->texnum);
+
+	//R_BindAnimatedImage(&
+		
+		
 
 	qglUseProgram(tr.glslProgram);
 
@@ -1830,6 +1834,11 @@ void RB_EndSurface( void ) {
 	shaderCommands_t *input;
 
 	input = &tess;
+	if (input->shader->polygonOffset) {
+		qglEnable(GL_POLYGON_OFFSET_FILL);
+		qglPolygonOffset(r_offsetFactor->value, r_offsetUnits->value);
+		return;//TODO
+	}
 
 	if (input->numVBO) {
 		
@@ -1853,6 +1862,10 @@ void RB_EndSurface( void ) {
 		
 		tess.numVBO = 0;
 		return;
+	}
+
+	if (input->shader->polygonOffset) {
+		qglDisable(GL_POLYGON_OFFSET_FILL);
 	}
 
 	if ( input->numIndexes == 0 ) {

@@ -3429,6 +3429,7 @@ qboolean QGL_Init( const char *dllname ) {
 
 	qwglSwapIntervalEXT         = 0;
 	qglActiveTextureARB         = 0;
+	qglActiveTexture			= 0;
 	qglClientActiveTextureARB   = 0;
 	qglMultiTexCoord2fARB       = 0;
 	qglLockArraysEXT            = 0;
