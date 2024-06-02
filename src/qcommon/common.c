@@ -141,7 +141,7 @@ A raw string should NEVER be passed as fmt, because of "%f" type crashers.
 */
 void QDECL Com_Printf( const char *fmt, ... ) {
 	va_list argptr;
-	char msg[MAXPRINTMSG];
+	char msg[MAXPRINTMSG*4];
 	static qboolean opening_qconsole = qfalse;
 
 	va_start( argptr,fmt );
@@ -1228,6 +1228,7 @@ void *Hunk_AllocDebug( int size, ha_pref preference, char *label, char *file, in
 void *Hunk_Alloc( int size, ha_pref preference ) {
 #endif
 	void    *buf;
+
 
 	if ( s_hunkData == NULL ) {
 		Com_Error( ERR_FATAL, "Hunk_Alloc: Hunk memory system not initialized" );

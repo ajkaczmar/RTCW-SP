@@ -40,6 +40,12 @@ void RE_LoadWorldMap( const char *name );
 
 */
 
+#define GL_ELEMENT_ARRAY_BUFFER 0x8892
+#define GL_STATIC_DRAW 0x88E4
+#define GL_ELEMENT_ARRAY_BUFFER 0x8893
+
+#define GL_ARRAY_BUFFER 0x8892
+
 static world_t s_worldData;
 static byte        *fileBase;
 
@@ -414,8 +420,49 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int 
 	cv->plane.type = PlaneTypeForNormal( cv->plane.normal );
 
 	surf->data = (surfaceType_t *)cv;
-}
+	/*
+	qglGenVertexArrays(1, &cv->vboIdx);
+	qglBindVertexArray(cv->vboIdx);
 
+	unsigned int vbo, ibo;
+	qglGenBuffers(1, &vbo);
+	qglGenBuffers(1, &ibo);
+	
+	qglBindBuffer(GL_ARRAY_BUFFER, vbo);
+	qglBufferData(GL_ARRAY_BUFFER, numPoints, &(cv->points[0][0]), GL_STATIC_DRAW);
+
+	qglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo);
+	//qglBufferData(GL_ELEMENT_ARRAY_BUFFER, cv->numIndices, .poin, GL_STATIC_DRAW);
+	*/
+
+	//glEnableVertexAttribArray(0);
+
+	//glEnableVertexAttribArray(1);
+
+	//glEnableVertexAttribArray(2);
+	//
+	/*
+	unsigned int VBO[2];
+	glGenBuffers(2, VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texcords), texcords, GL_STATIC_DRAW);
+
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);*/
+}
 
 /*
 ===============
@@ -1506,20 +1553,20 @@ static void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 	for ( i = 0 ; i < count ; i++, in++, out++ ) {
 		switch ( LittleLong( in->surfaceType ) ) {
 		case MST_PATCH:
-			ParseMesh( in, dv, out );
-			numMeshes++;
+			//ParseMesh( in, dv, out );
+			//numMeshes++;
 			break;
 		case MST_TRIANGLE_SOUP:
-			ParseTriSurf( in, dv, out, indexes );
-			numTriSurfs++;
+			//ParseTriSurf( in, dv, out, indexes );
+			//numTriSurfs++;
 			break;
 		case MST_PLANAR:
 			ParseFace( in, dv, out, indexes );
 			numFaces++;
 			break;
 		case MST_FLARE:
-			ParseFlare( in, dv, out, indexes );
-			numFlares++;
+			//ParseFlare( in, dv, out, indexes );
+			//numFlares++;
 			break;
 		default:
 			ri.Error( ERR_DROP, "Bad surfaceType" );
@@ -1527,13 +1574,13 @@ static void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 	}
 
 #ifdef PATCH_STITCHING
-	R_StitchAllPatches();
+//aka-x	R_StitchAllPatches();
 #endif
 
-	R_FixSharedVertexLodError();
+//aka-x	R_FixSharedVertexLodError();
 
 #ifdef PATCH_STITCHING
-	R_MovePatchSurfacesToHunk();
+	//aka-x R_MovePatchSurfacesToHunk();
 #endif
 
 	ri.Printf( PRINT_ALL, "...loaded %d faces, %i meshes, %i trisurfs, %i flares\n",

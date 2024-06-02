@@ -180,6 +180,9 @@ void R_BoxSurfaces_r( mnode_t *node, vec3_t mins, vec3_t maxs, surfaceType_t **l
 		}
 		//
 		surf = *mark;
+
+		if (!surf->shader) continue;
+
 		// check if the surface has NOIMPACT or NOMARKS set
 		if ( ( surf->shader->surfaceFlags & ( SURF_NOIMPACT | SURF_NOMARKS ) )
 			 || ( surf->shader->contentFlags & CONTENTS_FOG ) ) {

@@ -3450,7 +3450,7 @@ void CG_StartShakeCamera( float p, int duration, vec3_t src, float radius ) {
 
 /*
 ====================
-CG_CalcShakeCamera
+CG_CalcShakeCamera //AKA do analizy
 ====================
 */
 void CG_CalcShakeCamera() {
@@ -3510,7 +3510,7 @@ void CG_CalcShakeCamera() {
 
 /*
 ====================
-CG_ApplyShakeCamera
+CG_ApplyShakeCamera //AKA Ciekawa funkcja
 ====================
 */
 void CG_ApplyShakeCamera() {
@@ -3603,7 +3603,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cg.refdef.rdflags &= ~RDF_DRAWSKYBOX;
 	}
 
-	trap_R_RenderScene( &cg.refdef );
+	trap_R_RenderScene( &cg.refdef ); //AKA refdef - wyglada jak def. danych kamery
 
 	// restore original viewpoint if running stereo
 	if ( separation != 0 ) {

@@ -357,6 +357,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	//
 	// do overdraw measurement
 	//
+	/*
 	if ( r_measureOverdraw->integer ) {
 		if ( glConfig.stencilBits < 4 ) {
 			ri.Printf( PRINT_ALL, "Warning: not enough stencil bits to measure overdraw: %d\n", glConfig.stencilBits );
@@ -377,14 +378,14 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 		}
 		r_measureOverdraw->modified = qfalse;
 	} else
-	{
+	{*/
 		// this is only reached if it was on and is now off
 		if ( r_measureOverdraw->modified ) {
 			R_SyncRenderThread();
 			qglDisable( GL_STENCIL_TEST );
 		}
 		r_measureOverdraw->modified = qfalse;
-	}
+	/* }*/
 
 	//
 	// texturemode stuff
@@ -400,7 +401,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	//
 
 	// TRUFORM
-	if ( qglPNTrianglesiATI ) {
+	/*if (qglPNTrianglesiATI) {
 
 		// tess
 		if ( r_ati_truform_tess->modified ) {
@@ -446,7 +447,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 			}
 			qglPNTrianglesiATI( GL_PN_TRIANGLES_NORMAL_MODE_ATI, glConfig.ATINormalMode );
 		}
-	}
+	}*/
 
 	//
 	// NVidia stuff

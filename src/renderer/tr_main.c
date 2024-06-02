@@ -534,7 +534,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 	float axisLength;
 
 	if ( ent->e.reType != RT_MODEL ) {
-		*or = viewParms->world;
+	*or = viewParms->world;
 		return;
 	}
 
@@ -629,6 +629,7 @@ void R_RotateForViewer( void ) {
 
 	// convert from our coordinate system (looking down X)
 	// to OpenGL's coordinate system (looking down -Z)
+	//AKA tutaj zmiana tr.or.modelMatrix
 	myGlMultMatrix( viewerMatrix, s_flipMatrix, tr.or.modelMatrix );
 
 	tr.viewParms.world = tr.or;
@@ -813,7 +814,7 @@ static void SetFarClip( void ) {
 R_SetupProjection
 ===============
 */
-void R_SetupProjection( void ) {
+void R_SetupProjection( void ) { //AKA proj matrix
 	float xmin, xmax, ymin, ymax;
 	float width, height, depth;
 	float zNear, zFar;
@@ -1620,10 +1621,11 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	}
 
 	// sort the drawsurfs by sort type, then orientation, then shader
-	qsortFast( drawSurfs, numDrawSurfs, sizeof( drawSurf_t ) );
+	//AKA nie sortuj qsortFast( drawSurfs, numDrawSurfs, sizeof( drawSurf_t ) );
 
 	// check for any pass through drawing, which
 	// may cause another view to be rendered first
+	/* AKA nie sortuj
 	for ( i = 0 ; i < numDrawSurfs ; i++ ) {
 // GR - decompose with tessellation flag
 		R_DecomposeSort( ( drawSurfs + i )->sort, &entityNum, &shader, &fogNum, &dlighted, &atiTess );
@@ -1645,7 +1647,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 			}
 			break;      // only one mirror view at a time
 		}
-	}
+	}*/
 
 	R_AddDrawSurfCmd( drawSurfs, numDrawSurfs );
 }
@@ -1719,11 +1721,11 @@ void R_AddEntitySurfaces( void ) {
 					break;
 					// Ridah
 				case MOD_MDC:
-					R_AddMDCSurfaces( ent );
+					R_AddMDCSurfaces( ent ); //AKA inne modele
 					break;
 					// done.
 				case MOD_MDS:
-					R_AddAnimSurfaces( ent );
+					R_AddAnimSurfaces( ent ); //AKA model postaci anim
 					break;
 				case MOD_BRUSH:
 					R_AddBrushModelSurfaces( ent );

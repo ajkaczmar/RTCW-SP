@@ -98,6 +98,12 @@ If you have questions concerning this license or the applicable additional terms
 #define GL_TEXTURE2_ARB                     0x84C2
 #define GL_TEXTURE3_ARB                     0x84C3
 
+#define GL_COMPILE_STATUS 0x8B81
+#define GL_LINK_STATUS 0x8B82
+
+typedef char GLchar;
+typedef long GLsizeiptr;
+
 // TTimo: FIXME
 // linux needs those prototypes
 // GL_VERSION_1_2 is defined after #include <gl.h>
@@ -230,6 +236,9 @@ extern void ( APIENTRY * qglClearColor )( GLclampf red, GLclampf green, GLclampf
 extern void ( APIENTRY * qglClearDepth )( GLclampd depth );
 extern void ( APIENTRY * qglClearIndex )( GLfloat c );
 extern void ( APIENTRY * qglClearStencil )( GLint s );
+
+
+
 extern void ( APIENTRY * qglClipPlane )( GLenum plane, const GLdouble *equation );
 extern void ( APIENTRY * qglColor3b )( GLbyte red, GLbyte green, GLbyte blue );
 extern void ( APIENTRY * qglColor3bv )( const GLbyte *v );
@@ -319,6 +328,7 @@ extern void ( APIENTRY * qglGetDoublev )( GLenum pname, GLdouble *params );
 extern GLenum ( APIENTRY * qglGetError )( void );
 extern void ( APIENTRY * qglGetFloatv )( GLenum pname, GLfloat *params );
 extern void ( APIENTRY * qglGetIntegerv )( GLenum pname, GLint *params );
+extern const GLubyte* ( APIENTRY* glGetStringi )(GLenum name, GLuint index);
 extern void ( APIENTRY * qglGetLightfv )( GLenum light, GLenum pname, GLfloat *params );
 extern void ( APIENTRY * qglGetLightiv )( GLenum light, GLenum pname, GLint *params );
 extern void ( APIENTRY * qglGetMapdv )( GLenum target, GLenum query, GLdouble *v );
@@ -332,6 +342,7 @@ extern void ( APIENTRY * qglGetPixelMapusv )( GLenum map, GLushort *values );
 extern void ( APIENTRY * qglGetPointerv )( GLenum pname, GLvoid* *params );
 extern void ( APIENTRY * qglGetPolygonStipple )( GLubyte *mask );
 extern const GLubyte * ( APIENTRY * qglGetString )(GLenum name);
+extern const GLubyte* (APIENTRY* qglGetStringi)(GLenum name, GLuint index);
 extern void ( APIENTRY * qglGetTexEnvfv )( GLenum target, GLenum pname, GLfloat *params );
 extern void ( APIENTRY * qglGetTexEnviv )( GLenum target, GLenum pname, GLint *params );
 extern void ( APIENTRY * qglGetTexGendv )( GLenum coord, GLenum pname, GLdouble *params );
@@ -551,12 +562,42 @@ extern void ( APIENTRY * qglVertex4sv )( const GLshort *v );
 extern void ( APIENTRY * qglVertexPointer )( GLint size, GLenum type, GLsizei stride, const GLvoid *pointer );
 extern void ( APIENTRY * qglViewport )( GLint x, GLint y, GLsizei width, GLsizei height );
 
+extern GLuint(APIENTRY* qglCreateShader)(GLenum type);
+extern GLuint(APIENTRY* qglCreateProgram)();
+
+extern void (APIENTRY* qglShaderSource)(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
+extern void (APIENTRY* qglCompileShader)(GLuint shader);
+extern void (APIENTRY* qglAttachShader)(GLuint program, GLuint shader);
+extern void (APIENTRY* qglLinkProgram)(GLuint program);
+extern void (APIENTRY* qglDeleteShader)(GLuint shader);
+extern void (APIENTRY* qglUseProgram)(GLuint program);
+
+extern GLint(APIENTRY* qglGetUniformLocation)(GLuint program, const GLchar* name);
+extern void (APIENTRY* qglUniformMatrix4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);
+extern void (APIENTRY* qglUniform1i)(GLint location, GLint v0);
+extern void (APIENTRY* qglPatchParameteri)(GLenum pname, GLint value);
+
+extern void (APIENTRY* qglDeleteVertexArrays)(GLsizei n, const GLuint* arrays);
+extern void (APIENTRY* qglGetShaderiv)(GLuint shader, GLenum pname, GLint* params);
+extern void (APIENTRY* qglGetShaderInfoLog)(GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog);
+extern void (APIENTRY* qglGetProgramiv)(GLuint program, GLenum pname, GLint* params);
+extern void (APIENTRY* qglGetProgramInfoLog)(GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog);
+extern void (APIENTRY* qglBindVertexArray)(GLuint array);
+extern void (APIENTRY* qglBindBuffer)(GLenum target, GLuint buffer);
+extern void (APIENTRY* qglBufferData)(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
+extern void (APIENTRY* qglGenBuffers)(GLsizei n, GLuint* buffers);
+extern void (APIENTRY* qglGenVertexArrays)(GLsizei n, GLuint* arrays);
+extern void (APIENTRY* qglVertexAttribPointer)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer);
+//NEWGL
+
+
 #if defined( _WIN32 )
 
 extern int ( WINAPI * qwglChoosePixelFormat )( HDC, CONST PIXELFORMATDESCRIPTOR * );
 extern int ( WINAPI * qwglDescribePixelFormat )( HDC, int, UINT, LPPIXELFORMATDESCRIPTOR );
 extern int ( WINAPI * qwglGetPixelFormat )( HDC );
 extern BOOL ( WINAPI * qwglSetPixelFormat )( HDC, int, CONST PIXELFORMATDESCRIPTOR * );
+extern HGLRC( WINAPI * qwglCreateContextAttribsARB )(HDC hDC, HGLRC hshareContext, const int* attribList);
 extern BOOL ( WINAPI * qwglSwapBuffers )( HDC );
 
 extern BOOL ( WINAPI * qwglGetDeviceGammaRamp3DFX )( HDC, LPVOID );

@@ -1598,7 +1598,7 @@ void ClientBegin( int clientNum ) {
 	ent->r.svFlags |= SVF_CAPSULE;
 
 	// locate ent at a spawn point
-	ClientSpawn( ent );
+	ClientSpawn( ent );//aka prawdopod. tu ustalany pkt. poczoatkowy gry
 
 	// Ridah, trigger a spawn event
 	// DHM - Nerve :: Only in single player

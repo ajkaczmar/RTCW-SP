@@ -530,7 +530,7 @@ void CG_PredictPlayerState( void ) {
 	// if this is the first frame we must guarantee
 	// predictedPlayerState is valid even if there is some
 	// other error condition
-	if ( !cg.validPPS ) {
+	if ( !cg.validPPS ) {//AKA pierwsza pozycja kamery / playera
 		cg.validPPS = qtrue;
 		cg.predictedPlayerState = cg.snap->ps;
 	}

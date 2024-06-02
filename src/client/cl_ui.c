@@ -1203,7 +1203,6 @@ void CL_InitUI( void ) {
 	}
 
 //----(SA)	always dll
-
 #ifdef WOLF_SP_DEMO
 	uivm = VM_Create( "ui", CL_UISystemCalls, VMI_NATIVE );
 #else

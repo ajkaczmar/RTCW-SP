@@ -376,7 +376,7 @@ static void DrawSkySide( struct image_s *image, const int mins[2], const int max
 	int s, t;
 
 	GL_Bind( image );
-
+	/*AKA-X*/
 	for ( t = mins[1] + HALF_SKY_SUBDIVISIONS; t < maxs[1] + HALF_SKY_SUBDIVISIONS; t++ )
 	{
 		qglBegin( GL_TRIANGLE_STRIP );
@@ -396,7 +396,7 @@ static void DrawSkySide( struct image_s *image, const int mins[2], const int max
 
 static void DrawSkySideInner( struct image_s *image, const int mins[2], const int maxs[2] ) {
 	int s, t;
-
+	/*AKX
 	GL_Bind( image );
 
 	//qglDisable (GL_BLEND);
@@ -420,7 +420,7 @@ static void DrawSkySideInner( struct image_s *image, const int mins[2], const in
 		qglEnd();
 	}
 
-	qglDisable( GL_BLEND );
+	qglDisable( GL_BLEND );*/
 }
 
 static void DrawSkyBox( shader_t *shader ) {

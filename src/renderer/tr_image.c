@@ -1970,6 +1970,7 @@ Loads any of the supported image types into a cannonical
 */
 void R_LoadImage( const char *name, byte **pic, int *width, int *height ) {
 	int len;
+	ri.Printf(PRINT_WARNING, "WARNING: R_LoadImage could not %s \n", name);
 
 	*pic = NULL;
 	*width = 0;
@@ -1980,8 +1981,18 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height ) {
 		return;
 	}
 
-	if ( !Q_stricmp( name + len - 4, ".tga" ) ) {
+	if (!Q_stricmp(name + len - 4, ".tga")) {
 		LoadTGA( name, pic, width, height );          // try tga first
+		if (!*pic) {                              //
+			char altname[MAX_QPATH];                    // try jpg in place of tga
+			strcpy(altname, name);
+			len = strlen(altname);
+			altname[len - 3] = 'h';
+			altname[len - 2] = 'd';
+			altname[len - 1] = 'g';
+			LoadJPG(altname, pic, width, height);
+		}
+
 		if ( !*pic ) {                              //
 			char altname[MAX_QPATH];                    // try jpg in place of tga
 			strcpy( altname, name );
@@ -1996,6 +2007,9 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height ) {
 	} else if ( !Q_stricmp( name + len - 4, ".bmp" ) ) {
 		LoadBMP( name, pic, width, height );
 	} else if ( !Q_stricmp( name + len - 4, ".jpg" ) ) {
+		char hd_filename[256];
+		strcpy(hd_filename, name);
+
 		LoadJPG( name, pic, width, height );
 	}
 }

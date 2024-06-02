@@ -51,6 +51,10 @@ If you have questions concerning this license or the applicable additional terms
 extern void WG_CheckHardwareGamma( void );
 extern void WG_RestoreGamma( void );
 
+
+#   pragma warning (disable : 4113 4133 4047 )
+#   define WGLGPA( a ) qwglGetProcAddress( a )
+
 typedef enum {
 	RSERR_OK,
 
@@ -63,6 +67,9 @@ typedef enum {
 #define TRY_PFD_SUCCESS     0
 #define TRY_PFD_FAIL_SOFT   1
 #define TRY_PFD_FAIL_HARD   2
+
+#define WGL_CONTEXT_MAJOR_VERSION_ARB  0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB  0x2092
 
 #define WINDOW_CLASS_NAME   "Wolfenstein"
 
@@ -372,12 +379,25 @@ static int GLW_MakeContext( PIXELFORMATDESCRIPTOR *pPFD ) {
 		glw_state.pixelFormatSet = qtrue;
 	}
 
+
+#define WGL_CONTEXT_PROFILE_MASK_ARB   0x9126
+#define 	WGL_CONTEXT_CORE_PROFILE_BIT_ARB   0x00000001
+	
+	int attributeList[] = {
+		WGL_CONTEXT_MAJOR_VERSION_ARB, 2,
+		WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+		WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+		0,
+	};
+
 	//
 	// startup the OpenGL subsystem by creating a context and making it current
 	//
 	if ( !glw_state.hGLRC ) {
 		ri.Printf( PRINT_ALL, "...creating GL context: " );
-		if ( ( glw_state.hGLRC = qwglCreateContext( glw_state.hDC ) ) == 0 ) {
+
+		//if ((glw_state.hGLRC = qwglCreateContextAttribsARB(glw_state.hDC, 0, attributeList)) == 0) {
+		if ( ( glw_state.hGLRC = qwglCreateContextAttribsARB( glw_state.hDC, 0, attributeList) ) == 0 ) {
 			ri.Printf( PRINT_ALL, "failed\n" );
 
 			return TRY_PFD_FAIL_HARD;
@@ -396,6 +416,84 @@ static int GLW_MakeContext( PIXELFORMATDESCRIPTOR *pPFD ) {
 
 	return TRY_PFD_SUCCESS;
 }
+
+
+static void
+init_opengl_extensions(void)
+{
+	// Before we can load extensions, we need a dummy OpenGL context, created using a dummy window.
+	// We use a dummy window because you can only set the pixel format for a window once. For the
+	// real window, we want to use wglChoosePixelFormatARB (so we can potentially specify options
+	// that aren't available in PIXELFORMATDESCRIPTOR), but we can't load and use that before we
+	// have a context.
+	WNDCLASSA window_class = {
+		.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
+		.lpfnWndProc = DefWindowProcA,
+		.hInstance = GetModuleHandle(0),
+		.lpszClassName = "Dummy_WGL_djuasiodwa",
+	};
+
+	if (!RegisterClassA(&window_class)) {
+		//fatal_error("Failed to register dummy OpenGL window.");
+	}
+
+	HWND dummy_window = CreateWindowExA(
+		0,
+		window_class.lpszClassName,
+		"Dummy OpenGL Window",
+		0,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		0,
+		0,
+		window_class.hInstance,
+		0);
+
+	if (!dummy_window) {
+		//fatal_error("Failed to create dummy OpenGL window.");
+	}
+
+	HDC dummy_dc = GetDC(dummy_window);
+
+	PIXELFORMATDESCRIPTOR pfd = {
+		.nSize = sizeof(pfd),
+		.nVersion = 1,
+		.iPixelType = PFD_TYPE_RGBA,
+		.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+		.cColorBits = 32,
+		.cAlphaBits = 8,
+		.iLayerType = PFD_MAIN_PLANE,
+		.cDepthBits = 24,
+		.cStencilBits = 8,
+	};
+
+	int pixel_format = ChoosePixelFormat(dummy_dc, &pfd);
+	if (!pixel_format) {
+		//fatal_error("Failed to find a suitable pixel format.");
+	}
+	if (!SetPixelFormat(dummy_dc, pixel_format, &pfd)) {
+		//fatal_error("Failed to set the pixel format.");
+	}
+
+	HGLRC dummy_context = qwglCreateContext(dummy_dc);
+	if (!dummy_context) {
+		//fatal_error("Failed to create a dummy OpenGL rendering context.");
+	}
+
+	if (!qwglMakeCurrent(dummy_dc, dummy_context)) {
+		//fatal_error("Failed to activate dummy OpenGL rendering context.");
+	}
+
+	qwglCreateContextAttribsARB = qwglGetProcAddress("wglCreateContextAttribsARB");
+
+	qwglMakeCurrent(dummy_dc, 0);
+	qwglDeleteContext(dummy_context);
+	ReleaseDC(dummy_window, dummy_dc);
+	DestroyWindow(dummy_window);
+}
+
 
 
 /*
@@ -452,6 +550,7 @@ static qboolean GLW_InitDriver( const char *drivername, int colorbits ) {
 	//
 	// make two attempts to set the PIXELFORMAT
 	//
+	init_opengl_extensions();
 
 	//
 	// first attempt: r_colorbits, depthbits, and r_stencilbits
@@ -756,6 +855,8 @@ static rserr_t GLW_SetMode( const char *drivername,
 			ri.Printf( PRINT_ALL, "...using desktop display depth of %d\n", glw_state.desktopBitsPixel );
 		}
 
+		//#$$$$$
+
 		//
 		// if we're already in fullscreen then just create the window
 		//
@@ -1024,8 +1125,6 @@ static void GLW_InitExtensions( void ) {
 		ri.Printf( PRINT_ALL, "...WGL_3DFX_gamma_control not found\n" );
 	}
 
-
-
 //----(SA)	added
 
 
@@ -1093,6 +1192,33 @@ static void GLW_InitExtensions( void ) {
 	// support?
 //	SGIS_generate_mipmap
 //	ARB_multisample
+
+	qglGetStringi = WGLGPA("glGetStringi");
+
+	qglCreateShader = WGLGPA("glCreateShader");
+	qglShaderSource = WGLGPA("glShaderSource");
+	qglCreateProgram = WGLGPA("glCreateProgram");
+	qglCompileShader = WGLGPA("glCompileShader");
+	qglAttachShader =  WGLGPA("glAttachShader");
+	qglLinkProgram = WGLGPA("glLinkProgram");
+	qglDeleteShader = WGLGPA("glDeleteShader");
+	qglUseProgram = WGLGPA("glUseProgram");
+	qglGetUniformLocation = WGLGPA("glGetUniformLocation");
+	qglUniformMatrix4fv = WGLGPA("glUniformMatrix4fv");
+	qglUniform1i = WGLGPA("glUniform1i");
+	qglPatchParameteri = WGLGPA("glPatchParameteri");
+	qglDeleteVertexArrays = WGLGPA("glDeleteVertexArrays");
+	qglBindVertexArray = WGLGPA("glBindVertexArray");
+	qglBindBuffer = WGLGPA("glBindBuffer");
+	qglBufferData = WGLGPA("glBufferData");
+	qglGenBuffers = WGLGPA("glGenBuffers");
+	qglGenVertexArrays = WGLGPA("glGenVertexArrays");
+	qglVertexAttribPointer = WGLGPA("glVertexAttribPointer");
+
+	qglGetShaderiv = WGLGPA("glGetShaderiv");
+	qglGetShaderInfoLog = WGLGPA("glGetShaderInfoLog");
+	qglGetProgramiv = WGLGPA("glGetProgramiv");
+	qglGetProgramInfoLog = WGLGPA("glGetProgramInfoLog");
 }
 
 
@@ -1172,6 +1298,7 @@ static qboolean GLW_LoadOpenGL( const char *drivername ) {
 		} else
 #endif
 		{
+			r_fullscreen->integer = 0;
 			cdsFullscreen = r_fullscreen->integer;
 		}
 
@@ -1308,6 +1435,8 @@ static void GLW_StartOpenGL( void ) {
 	}
 }
 
+#define 	GL_NUM_EXTENSIONS   0x821D
+
 /*
 ** GLimp_Init
 **
@@ -1345,11 +1474,31 @@ void GLimp_Init( void ) {
 	// load appropriate DLL and initialize subsystem
 	GLW_StartOpenGL();
 
+	
+	qglGetStringi = qwglGetProcAddress("glGetStringi");
+
+
 	// get our config strings
 	Q_strncpyz( glConfig.vendor_string, qglGetString( GL_VENDOR ), sizeof( glConfig.vendor_string ) );
 	Q_strncpyz( glConfig.renderer_string, qglGetString( GL_RENDERER ), sizeof( glConfig.renderer_string ) );
 	Q_strncpyz( glConfig.version_string, qglGetString( GL_VERSION ), sizeof( glConfig.version_string ) );
-	Q_strncpyz( glConfig.extensions_string, qglGetString( GL_EXTENSIONS ), sizeof( glConfig.extensions_string ) );
+	//Q_strncpyz( glConfig.extensions_string, ""/*qglGetString(GL_EXTENSIONS)*/, sizeof(glConfig.extensions_string));
+	int numExtensions;
+	qglGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+	char* sbuf = &glConfig.extensions_string[0];
+	int w = 0;
+	/* glewContextInit should have initialized glGetStringi for us */
+	for (int i = 0; i < numExtensions; i++) {
+		const GLubyte* extName = qglGetStringi(GL_EXTENSIONS, i);
+		w = sprintf(sbuf, extName);
+		sbuf[w++] = ' ';
+		sbuf = sbuf + w;
+		/*GLuint len = _glewStrLen(extName);
+		if (_glewStrSame((const GLubyte*)name, extName, len)) {
+			return GL_TRUE;
+		}*/
+	}
+
 
 	//
 	// chipset specific configuration

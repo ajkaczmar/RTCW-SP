@@ -30,6 +30,151 @@ If you have questions concerning this license or the applicable additional terms
 
 // tr_shader.c -- this file deals with the parsing and definition of shaders
 
+
+// *************************** Tess shaders *******************************
+
+
+char* fs_shader = "#version 410 core\n"
+"in float Height;"
+"out vec4 FragColor;"
+"void main()"
+"{"
+"	//float h = (Height + 16) / 64.0f;\n"
+"	FragColor = vec4(1.0, 1.0, 1.0, 1.0);"
+"}";
+
+char* tcs_shader = "#version 410 core\n"
+"layout(vertices = 4) out;"
+"uniform mat4 view;"
+"in vec2 TexCoord[];"
+"out vec2 TextureCoord[]; "
+"void main()"
+"{"
+"	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;"
+"	TextureCoord[gl_InvocationID] = TexCoord[gl_InvocationID];"
+""
+"	if (gl_InvocationID == 0)"
+"	{"
+"		const int MIN_TESS_LEVEL = 4;"
+"		const int MAX_TESS_LEVEL = 64;"
+"		const float MIN_DISTANCE = 20;"
+"		const float MAX_DISTANCE = 800;"
+""
+"		vec4 eyeSpacePos00 = view * gl_in[0].gl_Position;"
+"		vec4 eyeSpacePos01 = view * gl_in[1].gl_Position;"
+"		vec4 eyeSpacePos10 = view * gl_in[2].gl_Position;"
+"		vec4 eyeSpacePos11 = view * gl_in[3].gl_Position;"
+""
+"		float distance00 = clamp((abs(eyeSpacePos00.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);"
+"		float distance01 = clamp((abs(eyeSpacePos01.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);"
+"		float distance10 = clamp((abs(eyeSpacePos10.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);"
+"		float distance11 = clamp((abs(eyeSpacePos11.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);"
+""
+"		float tessLevel0 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance10, distance00));"
+"		float tessLevel1 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance00, distance01));"
+"		float tessLevel2 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance01, distance11));"
+"		float tessLevel3 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance11, distance10));"
+""
+"		gl_TessLevelOuter[0] = tessLevel0;"
+"		gl_TessLevelOuter[1] = tessLevel1;"
+"		gl_TessLevelOuter[2] = tessLevel2;"
+"		gl_TessLevelOuter[3] = tessLevel3;"
+""
+"		gl_TessLevelInner[0] = max(tessLevel1, tessLevel3);"
+"		gl_TessLevelInner[1] = max(tessLevel0, tessLevel2);"
+"	}"
+"}";
+
+char* tes_shader = "#version 410 core\n"
+"layout(quads, fractional_odd_spacing, ccw) in;"
+""
+"uniform sampler2D heightMap;"
+"uniform mat4 view;"
+"uniform mat4 projection;"
+""
+"in vec2 TextureCoord[];"
+"out float Height;"
+""
+"void main()"
+"{"
+"	float u = gl_TessCoord.x;"
+"	float v = gl_TessCoord.y;"
+""
+"	vec2 t00 = TextureCoord[0];"
+"	vec2 t01 = TextureCoord[1];"
+"	vec2 t10 = TextureCoord[2];"
+"	vec2 t11 = TextureCoord[3];"
+""
+"	vec2 t0 = (t01 - t00) * u + t00;"
+"	vec2 t1 = (t11 - t10) * u + t10;"
+"	vec2 texCoord = (t1 - t0) * v + t0;"
+""
+"	Height = 1.0;//texture(heightMap, texCoord).y * 64.0 - 16.0;\n"
+""
+"	vec4 p00 = gl_in[0].gl_Position;"
+"	vec4 p01 = gl_in[1].gl_Position;"
+"	vec4 p10 = gl_in[2].gl_Position;"
+"	vec4 p11 = gl_in[3].gl_Position;"
+""
+"	vec4 uVec = p01 - p00;"
+"	vec4 vVec = p10 - p00;"
+"	vec4 normal = normalize(vec4(cross(vVec.xyz, uVec.xyz), 0));"
+""
+"	vec4 p0 = (p01 - p00) * u + p00;"
+"	vec4 p1 = (p11 - p10) * u + p10;"
+"	vec4 p = (p1 - p0) * v + p0 + normal * Height;"
+""
+"	gl_Position = projection * view * p;"
+"}";
+
+
+char* vs_shader = "#version 410 core\n"
+"layout(location = 0) in vec3 aPos;"
+"layout(location = 8) in vec2 aTex;"
+""
+"out vec2 TexCoord;"
+""
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+""
+"void main()"
+"{"
+"	gl_Position = vec4(aPos, 1.0);\n"
+"	TexCoord = aTex;"
+"}";
+
+// *************************** Tess shaders *******************************
+
+char* fs_tx0 = "#version 330 core\n"
+"out vec4 FragColor;"
+"in vec2 TexCoord;"
+"uniform sampler2D texture1;"
+"uniform sampler2D texture2;"
+""
+"void main()"
+"{"
+"	FragColor = texture(texture1, TexCoord);"// vec4(texture(texture1, TexCoord), 1.0f);" //mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);"
+"}\n";
+
+
+char* vs_tx0 = "#version 330 core\n"
+"layout(location = 0) in vec3 aPos;\n"
+"layout(location = 8) in vec2 aTexCoord;\n"
+"\n"
+"out vec2 TexCoord;\n"
+"\n"
+"uniform mat4 modelx;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+"\n"
+"void main()"
+"{"
+"	gl_Position = projection * view * vec4(aPos, 1.0f);"
+"	TexCoord = vec2(aTexCoord.x, aTexCoord.y);"
+"}\n";
+
+
+
 static char *s_shaderText;
 
 // the shader is parsed into these global variables, then copied into
@@ -3304,4 +3449,125 @@ void R_InitShaders( void ) {
 
 	// Ridah
 	R_LoadCacheShaders();
+
+	tr.tessProgram = R_CompileTessShader();
+
+	tr.glslProgram = R_CompileTex0Shader();
+}
+
+void checkCompileErrors(GLuint shader, char* type)
+{
+	GLint success;
+	GLchar infoLog[1024];
+	if (type != "PROGRAM")
+	{
+		qglGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+		if (!success)
+		{
+			qglGetShaderInfoLog(shader, 1024, NULL, infoLog);
+			ri.Error( ERR_DROP, infoLog );
+		}
+	}
+	else
+	{
+		qglGetProgramiv(shader, GL_LINK_STATUS, &success);
+		if (!success)
+		{
+			qglGetProgramInfoLog(shader, 1024, NULL, infoLog);
+			ri.Error(ERR_DROP, infoLog );
+		}
+	}
+}
+//qglGetShaderInfoLog
+//qglGetProgramInfoLog
+//qglGetProgramiv
+
+#define GL_TESS_EVALUATION_SHADER 0x8E87
+#define GL_TESS_CONTROL_SHADER 0x8E88
+#define GL_VERTEX_SHADER 0x8B31
+#define GL_FRAGMENT_SHADER 0x8B30
+
+GLuint R_CompileTessShader() {
+	unsigned int vertex, fragment;
+
+	vertex = qglCreateShader(GL_VERTEX_SHADER);
+	qglShaderSource(vertex, 1, &vs_shader, NULL);
+	qglCompileShader(vertex);
+	checkCompileErrors(vertex, "VERTEX");
+	// fragment Shader
+	fragment = qglCreateShader(GL_FRAGMENT_SHADER);
+	qglShaderSource(fragment, 1, &fs_shader, NULL);
+	qglCompileShader(fragment);
+	checkCompileErrors(fragment, "FRAGMENT");
+	
+	// if tessellation shader is given, compile tessellation shader
+	/*unsigned int tessControl;
+	tessControl = qglCreateShader(GL_TESS_CONTROL_SHADER);
+	qglShaderSource(tessControl, 1, &tcs_shader, NULL);
+	qglCompileShader(tessControl);
+	checkCompileErrors(tessControl, "TESS_CONTROL");*/
+
+	unsigned int tessEval;
+	tessEval = qglCreateShader(GL_TESS_EVALUATION_SHADER);
+	qglShaderSource(tessEval, 1, &tes_shader, NULL);
+	qglCompileShader(tessEval);
+	checkCompileErrors(tessEval, "TESS_EVALUATION");
+	
+	// shader Program
+	GLuint ID = qglCreateProgram();
+	qglAttachShader(ID, vertex);
+	qglAttachShader(ID, fragment);		
+	//qglAttachShader(ID, tessControl);
+	qglAttachShader(ID, tessEval);
+
+	qglLinkProgram(ID);
+	checkCompileErrors(ID, "PROGRAM");
+	// delete the shaders as they're linked into our program now and no longer necessery
+	qglDeleteShader(vertex);
+	qglDeleteShader(fragment);//pozostale dodac
+	//qglDeleteShader(tessControl);
+	qglDeleteShader(tessEval);
+
+	tr.glsl_tess_view = qglGetUniformLocation(ID, "view");
+	tr.glsl_tess_projection = qglGetUniformLocation(ID, "projection");
+	//tr.glsl_tess_tex1 = qglGetUniformLocation(ID, "texture1");
+
+	qglUseProgram(0);
+
+	return ID;
+}
+
+GLuint R_CompileTex0Shader() {
+	unsigned int vertex, fragment;
+
+	vertex = qglCreateShader(GL_VERTEX_SHADER);
+	qglShaderSource(vertex, 1, &vs_tx0, NULL);
+	qglCompileShader(vertex);
+	checkCompileErrors(vertex, "VERTEX");
+	// fragment Shader
+	fragment = qglCreateShader(GL_FRAGMENT_SHADER);
+	qglShaderSource(fragment, 1, &fs_tx0, NULL);
+	qglCompileShader(fragment);
+	checkCompileErrors(fragment, "FRAGMENT");
+
+	// shader Program
+	GLuint ID = qglCreateProgram();
+	qglAttachShader(ID, vertex);
+	qglAttachShader(ID, fragment);
+
+	qglLinkProgram(ID);
+	checkCompileErrors(ID, "PROGRAM");
+	// delete the shaders as they're linked into our program now and no longer necessery
+	qglDeleteShader(vertex);
+	qglDeleteShader(fragment);
+
+	qglUseProgram(ID);
+
+	tr.glsl_m_view = qglGetUniformLocation(ID, "view");
+	tr.glsl_m_projection = qglGetUniformLocation(ID, "projection");
+	tr.glsl_p_tex1 = qglGetUniformLocation(ID, "texture1");
+
+	qglUseProgram(0);
+
+	return ID;
 }

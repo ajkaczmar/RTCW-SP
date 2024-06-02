@@ -54,6 +54,7 @@ BOOL ( WINAPI * qwglSwapBuffers )( HDC );
 
 BOOL ( WINAPI * qwglCopyContext )( HGLRC, HGLRC, UINT );
 HGLRC ( WINAPI * qwglCreateContext )( HDC );
+HGLRC ( WINAPI* qwglCreateContextAttribsARB )( HDC hDC, HGLRC hshareContext, const int* attribList );
 HGLRC ( WINAPI * qwglCreateLayerContext )( HDC, int );
 BOOL ( WINAPI * qwglDeleteContext )( HGLRC );
 HGLRC ( WINAPI * qwglGetCurrentContext )( VOID );
@@ -180,6 +181,7 @@ void ( APIENTRY * qglGetDoublev )( GLenum pname, GLdouble *params );
 GLenum ( APIENTRY * qglGetError )( void );
 void ( APIENTRY * qglGetFloatv )( GLenum pname, GLfloat *params );
 void ( APIENTRY * qglGetIntegerv )( GLenum pname, GLint *params );
+const GLubyte* (APIENTRY* qglGetStringi)(GLenum name, GLuint index);
 void ( APIENTRY * qglGetLightfv )( GLenum light, GLenum pname, GLfloat *params );
 void ( APIENTRY * qglGetLightiv )( GLenum light, GLenum pname, GLint *params );
 void ( APIENTRY * qglGetMapdv )( GLenum target, GLenum query, GLdouble *v );
@@ -413,6 +415,33 @@ void ( APIENTRY * qglVertexPointer )( GLint size, GLenum type, GLsizei stride, c
 void ( APIENTRY * qglViewport )( GLint x, GLint y, GLsizei width, GLsizei height );
 
 
+GLuint (APIENTRY* qglCreateShader)(GLenum type);
+GLuint (APIENTRY* qglCreateProgram)();
+
+
+void (APIENTRY* qglShaderSource)(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
+void (APIENTRY* qglCompileShader)(GLuint shader);
+void (APIENTRY* qglAttachShader)(GLuint program, GLuint shader);
+void (APIENTRY* qglLinkProgram)(GLuint program);
+void (APIENTRY* qglDeleteShader)(GLuint shader);
+void (APIENTRY* qglUseProgram)(GLint location, GLfloat v0);
+GLint (APIENTRY* qglGetUniformLocation)(GLuint program, const GLchar* name);
+void (APIENTRY* qglBindVertexArray)(GLuint array);
+void (APIENTRY* qglBindBuffer)(GLenum target, GLuint buffer);
+void (APIENTRY* qglBufferData)(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
+void (APIENTRY* qglGenBuffers)(GLsizei n, GLuint* buffers);
+void (APIENTRY* qglGenVertexArrays)(GLsizei n, GLuint* arrays);
+void (APIENTRY* qglVertexAttribPointer)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer);
+
+void (APIENTRY* qglUniformMatrix4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);
+void (APIENTRY* qglUniform1i)(GLint location, GLint v0);
+void (APIENTRY* qglPatchParameteri)(GLenum pname, GLint value);
+void (APIENTRY* qglDeleteVertexArrays)(GLsizei n, const GLuint* arrays);
+void (APIENTRY* qglGetShaderiv)(GLuint shader, GLenum pname, GLint* params);
+void (APIENTRY* qglGetShaderInfoLog)(GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog);
+void (APIENTRY* qglGetProgramiv)(GLuint program, GLenum pname, GLint* params);
+void (APIENTRY* qglGetProgramInfoLog)(GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog);
+//NEWGL
 
 static void ( APIENTRY * dllAccum )( GLenum op, GLfloat value );
 static void ( APIENTRY * dllAlphaFunc )( GLenum func, GLclampf ref );
@@ -519,6 +548,8 @@ static void ( APIENTRY * dllGetDoublev )( GLenum pname, GLdouble *params );
 GLenum ( APIENTRY * dllGetError )( void );
 static void ( APIENTRY * dllGetFloatv )( GLenum pname, GLfloat *params );
 static void ( APIENTRY * dllGetIntegerv )( GLenum pname, GLint *params );
+static const GLubyte* (APIENTRY* dllGetStringi)(GLenum name, GLuint index);
+
 static void ( APIENTRY * dllGetLightfv )( GLenum light, GLenum pname, GLfloat *params );
 static void ( APIENTRY * dllGetLightiv )( GLenum light, GLenum pname, GLint *params );
 static void ( APIENTRY * dllGetMapdv )( GLenum target, GLenum query, GLdouble *v );
@@ -750,6 +781,20 @@ static void ( APIENTRY * dllVertex4s )( GLshort x, GLshort y, GLshort z, GLshort
 static void ( APIENTRY * dllVertex4sv )( const GLshort *v );
 static void ( APIENTRY * dllVertexPointer )( GLint size, GLenum type, GLsizei stride, const GLvoid *pointer );
 static void ( APIENTRY * dllViewport )( GLint x, GLint y, GLsizei width, GLsizei height );
+static GLuint (APIENTRY* dllCreateShader)( GLenum type );
+static GLuint (APIENTRY* dllCreateProgram)();
+static void (APIENTRY* dllShaderSource)(GLuint program);
+static void (APIENTRY* dllCompileShader)();
+static void (APIENTRY* dllAttachShader)(GLuint program, GLuint shader);
+static void (APIENTRY* dllLinkProgram)(GLuint program);
+static void (APIENTRY* dllDeleteShader)(GLuint shader);
+static void (APIENTRY* dllUseProgram)(GLint location, GLfloat v0);
+static void (APIENTRY* dllGetUniformLocation)(GLuint program, GLint location, GLfloat* params);
+static void (APIENTRY* dllUniformMatrix4fv)(GLuint program);
+static void (APIENTRY* dllUniform1i)(GLint location, GLint v0);
+static void (APIENTRY* dllPatchParameteri)(GLenum pname, const GLfloat* values);
+static void (APIENTRY* dllDeleteVertexArrays)(GLsizei n, GLuint* arrays);
+//NEWGL
 
 static const char * BooleanToString( GLboolean b ) {
 	if ( b == GL_FALSE ) {
@@ -1162,7 +1207,7 @@ static void APIENTRY logColorMaterial( GLenum face, GLenum mode ) {
 }
 
 static void APIENTRY logColorPointer( GLint size, GLenum type, GLsizei stride, const void *pointer ) {
-	fprintf( glw_state.log_fp, "glColorPointer( %d, %s, %d, MEM )\n", size, TypeToString( type ), stride );
+	fprintf( glw_state.log_fp, "//glColorPointer( %d, %s, %d, MEM )\n", size, TypeToString( type ), stride );
 	dllColorPointer( size, type, stride, pointer );
 }
 
@@ -2469,6 +2514,70 @@ static void APIENTRY logViewport( GLint x, GLint y, GLsizei width, GLsizei heigh
 	fprintf( glw_state.log_fp, "glViewport( %d, %d, %d, %d )\n", x, y, width, height );
 	dllViewport( x, y, width, height );
 }
+static GLuint APIENTRY logCreateShader(GLenum type) {
+	fprintf(glw_state.log_fp, "glCreateShader( %d )\n", type);
+	return dllCreateShader(type);
+}
+
+static void APIENTRY logShaderSource(GLuint program) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllShaderSource(program);
+}
+
+static GLuint APIENTRY logCreateProgram() {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	return dllCreateProgram();
+}
+
+static void APIENTRY logCompileShader() {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllCompileShader();
+}
+
+static void APIENTRY logAttachShader(GLuint program, GLuint shader) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllCompileShader(program, shader);
+}
+
+static void APIENTRY logLinkProgram(GLuint program) {
+	//fprintf(glw_state.log_fp, "glLinkProgram( %d )\n", program);
+	dllLinkProgram(program);
+}
+
+static void APIENTRY logDeleteShader(GLuint shader) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllDeleteShader(shader);
+}
+
+static void APIENTRY logUseProgram(GLint location, GLfloat v0) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllUseProgram(location, v0);
+}
+
+static void APIENTRY logGetUniformLocation(GLuint program, GLint location, GLfloat* params) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllGetUniformLocation(program, location, params);
+}
+
+static void APIENTRY logUniformMatrix4fv(GLuint program, GLint location, GLfloat* params) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllUniformMatrix4fv(program, location, params);
+}
+
+static void APIENTRY logUniform1i(GLint location, GLint v0) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllUniform1i(location, v0);
+}
+
+static void APIENTRY logPatchParameteri(GLenum pname, const GLfloat* values) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	dllPatchParameteri(pname, values);
+}
+
+static void APIENTRY logDeleteVertexArrays(GLsizei n, GLuint* arrays) {
+	//fprintf(glw_state.log_fp, "glCreateShader( %d )\n", program);
+	logDeleteVertexArrays(n, arrays);
+}
 
 /*
 ** QGL_Shutdown
@@ -2822,9 +2931,25 @@ void QGL_Shutdown( void ) {
 	qglVertex4sv                 = NULL;
 	qglVertexPointer             = NULL;
 	qglViewport                  = NULL;
+	//NEWGL
+	qglCreateShader = NULL;
+	qglShaderSource = NULL;
+	qglCreateProgram = NULL;
+
+	qglCompileShader = NULL;
+	qglAttachShader = NULL;
+	qglLinkProgram = NULL;
+	qglDeleteShader = NULL;
+	qglUseProgram = NULL;
+	qglGetUniformLocation = NULL;
+	qglUniformMatrix4fv = NULL;
+	qglUniform1i = NULL;
+	qglPatchParameteri = NULL;
+	qglDeleteVertexArrays = NULL;
 
 	qwglCopyContext              = NULL;
 	qwglCreateContext            = NULL;
+	qwglCreateContextAttribsARB = NULL;
 	qwglCreateLayerContext       = NULL;
 	qwglDeleteContext            = NULL;
 	qwglDescribeLayerPlane       = NULL;
@@ -2893,6 +3018,9 @@ qboolean GlideIsValid( void ) {
 
 #   pragma warning (disable : 4113 4133 4047 )
 #   define GPA( a ) GetProcAddress( glw_state.hinstOpenGL, a )
+
+#   pragma warning (disable : 4113 4133 4047 )
+#   define WGLGPA( a ) qwglGetProcAddress( a )
 
 /*
 ** QGL_Init
@@ -3041,6 +3169,8 @@ qboolean QGL_Init( const char *dllname ) {
 	qglGetError                  =  dllGetError                  = ( GLenum ( __stdcall * )(void) )GPA( "glGetError" );
 	qglGetFloatv                 =  dllGetFloatv                 = GPA( "glGetFloatv" );
 	qglGetIntegerv               =  dllGetIntegerv               = GPA( "glGetIntegerv" );
+	qglGetStringi = dllGetStringi = GPA("glGetStringi");
+
 	qglGetLightfv                =  dllGetLightfv                = GPA( "glGetLightfv" );
 	qglGetLightiv                =  dllGetLightiv                = GPA( "glGetLightiv" );
 	qglGetMapdv                  =  dllGetMapdv                  = GPA( "glGetMapdv" );
@@ -3270,9 +3400,10 @@ qboolean QGL_Init( const char *dllname ) {
 	qglVertex4sv                 =  dllVertex4sv                 = GPA( "glVertex4sv" );
 	qglVertexPointer             =  dllVertexPointer             = GPA( "glVertexPointer" );
 	qglViewport                  =  dllViewport                  = GPA( "glViewport" );
-
+	
 	qwglCopyContext             = GPA( "wglCopyContext" );
 	qwglCreateContext           = GPA( "wglCreateContext" );
+	qwglCreateContextAttribsARB = GPA( "wglCreateContextAttribsARB" );
 	qwglCreateLayerContext      = GPA( "wglCreateLayerContext" );
 	qwglDeleteContext           = GPA( "wglDeleteContext" );
 	qwglDescribeLayerPlane      = GPA( "wglDescribeLayerPlane" );
@@ -3294,6 +3425,7 @@ qboolean QGL_Init( const char *dllname ) {
 	qwglSetPixelFormat          = GPA( "wglSetPixelFormat" );
 	qwglSwapBuffers             = GPA( "wglSwapBuffers" );
 
+
 	qwglSwapIntervalEXT         = 0;
 	qglActiveTextureARB         = 0;
 	qglClientActiveTextureARB   = 0;
@@ -3309,6 +3441,24 @@ qboolean QGL_Init( const char *dllname ) {
 
 	// check logging
 	QGL_EnableLogging( r_logFile->integer );
+
+	//NEWGL WGLGPA
+	/*
+	qglCreateShader = dllCreateShader = GPA("glCreateShader");
+	qglShaderSource = dllShaderSource = GPA("glShaderSource");
+	qglCreateProgram = dllCreateProgram = GPA("glCreateProgram");
+	qglCompileShader = dllCompileShader = GPA("glCompileShader");
+	qglAttachShader = dllAttachShader = GPA("glAttachShader");
+	qglLinkProgram = dllLinkProgram = GPA("glLinkProgram");
+	qglDeleteShader = dllDeleteShader = GPA("glDeleteShader");
+	qglUseProgram = dllUseProgram = GPA("glUseProgram");
+	qglGetUniformLocation = dllGetUniformLocation = GPA("glGetUniformLocation");
+	qglUniformMatrix4fv
+	qglPatchParameteri = dllPatchParameteri = GPA("glPatchParameteri");
+	qglDeleteVertexArrays = dllDeleteVertexArrays = GPA("glDeleteVertexArrays");
+	*/
+
+
 
 	return qtrue;
 }
@@ -3688,6 +3838,23 @@ void QGL_EnableLogging( qboolean enable ) {
 		qglVertex4sv                 =  logVertex4sv                 ;
 		qglVertexPointer             =  logVertexPointer             ;
 		qglViewport                  =  logViewport                  ;
+		//NEWGL
+		qglCreateShader = logCreateShader;
+		qglShaderSource = logShaderSource;
+		qglCreateProgram = logCreateProgram;
+
+		qglCompileShader = logCompileShader;
+		qglAttachShader = logAttachShader;
+		qglLinkProgram = logLinkProgram;
+		qglDeleteShader = logDeleteShader;
+		qglUseProgram = logUseProgram;
+		qglGetUniformLocation = logGetUniformLocation;
+
+		qglUniformMatrix4fv = logUniformMatrix4fv;
+		qglUniform1i = logUniform1i;
+		qglPatchParameteri = logPatchParameteri;
+		qglDeleteVertexArrays = logDeleteVertexArrays;
+
 	} else
 	{
 		if ( glw_state.log_fp ) {
@@ -4031,6 +4198,23 @@ void QGL_EnableLogging( qboolean enable ) {
 		qglVertex4sv                 =  dllVertex4sv                 ;
 		qglVertexPointer             =  dllVertexPointer             ;
 		qglViewport                  =  dllViewport                  ;
+		//NEWGL
+		qglCreateShader = dllCreateShader;
+		qglShaderSource = dllShaderSource;
+		qglCreateProgram = dllCreateProgram;
+
+		qglCompileShader = dllCompileShader;
+		qglAttachShader = dllAttachShader;
+		qglLinkProgram = dllLinkProgram;
+		qglDeleteShader = dllDeleteShader;
+		qglUseProgram = dllUseProgram;
+		qglGetUniformLocation = dllGetUniformLocation;
+
+		qglUniformMatrix4fv = dllUniformMatrix4fv;
+		qglUniform1i = dllUniform1i;
+
+		qglPatchParameteri = dllPatchParameteri;
+		qglDeleteVertexArrays = dllDeleteVertexArrays;
 	}
 }
 

@@ -925,7 +925,7 @@ static float roll = 0.0;
 
 /*
 ===============
-CG_AddParticles
+CG_AddParticles //AKA do analizy
 ===============
 */
 void CG_AddParticles( void ) {

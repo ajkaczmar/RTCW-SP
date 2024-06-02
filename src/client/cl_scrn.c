@@ -439,7 +439,6 @@ This will be called twice if rendering in stereo mode
 ==================
 */
 void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
-	re.BeginFrame( stereoFrame );
 
 	// wide aspect ratio screens need to have the sides cleared
 	// unless they are displaying game renderings
@@ -519,7 +518,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 
 /*
 ==================
-SCR_UpdateScreen
+SCR_UpdateScreen //AKA BeginFrame  EndFrame tutaj
 
 This is called every frame, and can also be called explicitly to flush
 text to the screen.
@@ -537,13 +536,11 @@ void SCR_UpdateScreen( void ) {
 	}
 	recursive = 1;
 
-	// if running in stereo, we need to draw the frame twice
-	if ( cls.glconfig.stereoEnabled ) {
-		SCR_DrawScreenField( STEREO_LEFT );
-		SCR_DrawScreenField( STEREO_RIGHT );
-	} else {
-		SCR_DrawScreenField( STEREO_CENTER );
-	}
+
+	re.BeginFrame(STEREO_CENTER);
+
+	SCR_DrawScreenField( STEREO_CENTER );
+	
 
 	if ( com_speeds->integer ) {
 		re.EndFrame( &time_frontend, &time_backend );

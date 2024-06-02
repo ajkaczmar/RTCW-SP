@@ -102,7 +102,7 @@ idCameraDef splineList;
 idCameraDef *g_splineList = &splineList;
 
 idVec3 idSplineList::zero( 0,0,0 );
-
+//aka do sprawdzenia
 void glLabeledPoint( idVec3 &color, idVec3 &point, float size, const char *label ) {
 	qglColor3fv( color );
 	qglPointSize( size );

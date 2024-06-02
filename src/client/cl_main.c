@@ -2242,7 +2242,7 @@ DLL glue
 #define MAXPRINTMSG 4096
 void QDECL CL_RefPrintf( int print_level, const char *fmt, ... ) {
 	va_list argptr;
-	char msg[MAXPRINTMSG];
+	char msg[MAXPRINTMSG * 4];
 
 	va_start( argptr,fmt );
 	vsprintf( msg,fmt,argptr );

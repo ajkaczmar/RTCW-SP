@@ -49,10 +49,16 @@ void GL_Bind( image_t *image ) {
 	int texnum;
 
 	if ( !image ) {
-		ri.Printf( PRINT_WARNING, "GL_Bind: NULL image\n" );
+		//ri.Printf( PRINT_WARNING, "GL_Bind: NULL image\n" );
 		texnum = tr.defaultImage->texnum;
 	} else {
+		//ri.Printf(PRINT_WARNING, "GL_Bind: image: %s \n", image->imgName);
 		texnum = image->texnum;
+	}
+
+	if (image->imgName && strstr(image->imgName, "anatom")) {
+		int d;
+		d = 3;
 	}
 
 	if ( r_nobind->integer && tr.dlightImage ) {        // performance evaluation option
@@ -70,9 +76,10 @@ void GL_Bind( image_t *image ) {
 ** GL_SelectTexture
 */
 void GL_SelectTexture( int unit ) {
-	if ( glState.currenttmu == unit ) {
+	if (glState.currenttmu == unit) {
 		return;
 	}
+	//AKA-X
 
 	if ( unit == 0 ) {
 		qglActiveTextureARB( GL_TEXTURE0_ARB );
@@ -84,6 +91,18 @@ void GL_SelectTexture( int unit ) {
 		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE1_ARB )\n" );
 		qglClientActiveTextureARB( GL_TEXTURE1_ARB );
 		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE1_ARB )\n" );
+	}
+	else if (unit == 2) {
+		qglActiveTextureARB(GL_TEXTURE2_ARB);
+		GLimp_LogComment("glActiveTextureARB( GL_TEXTURE2_ARB )\n");
+		qglClientActiveTextureARB(GL_TEXTURE2_ARB);
+		GLimp_LogComment("glClientActiveTextureARB( GL_TEXTURE2_ARB )\n");
+	}
+	else if (unit == 3) {
+		qglActiveTextureARB(GL_TEXTURE3_ARB);
+		GLimp_LogComment("glActiveTextureARB( GL_TEXTURE3_ARB )\n");
+		qglClientActiveTextureARB(GL_TEXTURE3_ARB);
+		GLimp_LogComment("glClientActiveTextureARB( GL_TEXTURE3_ARB )\n");
 	} else {
 		ri.Error( ERR_DROP, "GL_SelectTexture: unit = %i", unit );
 	}
@@ -162,9 +181,7 @@ void GL_TexEnv( int env ) {
 	if ( env == glState.texEnv[glState.currenttmu] ) {
 		return;
 	}
-
 	glState.texEnv[glState.currenttmu] = env;
-
 
 	switch ( env )
 	{
@@ -950,6 +967,8 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		// change the tess parameters if needed
 		// a "entityMergable" shader is a shader that can have surfaces from seperate
 		// entities merged into a single batch, like smoke and blood puff sprites
+
+		//AKA - czy koniec Surface jesli jest rozny shader, fornr albo dlight + costamcostam :) i rozpoczecie nowej ponizej
 		if ( shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted
 // GR - force draw on tessellation flag change
 			 || ( atiTess != oldAtiTess )
@@ -981,6 +1000,8 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		//
 		// change the modelview matrix if needed
 		//
+
+		// AKA liczenie nowej view matrix jezeli zmienia sie entity
 		if ( entityNum != oldEntityNum ) {
 			depthRange = qfalse;
 
@@ -1007,6 +1028,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 			} else {
 				backEnd.currentEntity = &tr.worldEntity;
 				backEnd.refdef.floatTime = originalTime;
+				//AKA tu ustawia matrix
 				backEnd.or = backEnd.viewParms.world;
 
 				// we have to reset the shaderTime as well otherwise image animations on
@@ -1015,7 +1037,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 
 				R_TransformDlights( backEnd.refdef.num_dlights, backEnd.refdef.dlights, &backEnd.or );
 			}
-
+			//AKA tu ustawianie macierzy
 			qglLoadMatrixf( backEnd.or.modelMatrix );
 
 			//
@@ -1042,11 +1064,12 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		rb_surfaceTable[ *drawSurf->surface ]( drawSurf->surface );
 
 		// RF, convert the newly created vertexes into dust particles, and overwrite
-		if ( backEnd.currentEntity->e.reFlags & REFLAG_ZOMBIEFX ) {
+		/*AKA
+		if (backEnd.currentEntity->e.reFlags & REFLAG_ZOMBIEFX) {
 			RB_ZombieFX( 0, drawSurf, oldNumVerts, oldNumIndex );
 		} else if ( backEnd.currentEntity->e.reFlags & REFLAG_ZOMBIEFX2 )     {
 			RB_ZombieFX( 1, drawSurf, oldNumVerts, oldNumIndex );
-		}
+		}*/
 	}
 
 	// draw the contents of the last shader batch
@@ -1063,21 +1086,21 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	backEnd.refdef.floatTime = originalTime;
 	backEnd.or = backEnd.viewParms.world;
 	R_TransformDlights( backEnd.refdef.num_dlights, backEnd.refdef.dlights, &backEnd.or );
-
-	qglLoadMatrixf( backEnd.viewParms.world.modelMatrix );
+	//AKA tu ustawianie macierzy
+	//AKA ?? czy to jest potrzebne qglLoadMatrixf( backEnd.viewParms.world.modelMatrix );
 	if ( depthRange ) {
 		qglDepthRange( 0, 1 );
 	}
 
 	// (SA) draw sun
-	RB_DrawSun();
+	//AKA RB_DrawSun();
 
 
 	// darken down any stencil shadows
-	RB_ShadowFinish();
+	//AKA RB_ShadowFinish();
 
 	// add light flares on lights that aren't obscured
-	RB_RenderFlares();
+	//AKA RB_RenderFlares();
 
 #ifdef __MACOS__
 	Sys_PumpEvents();       // crutch up the mac's limited buffer queue size
@@ -1100,10 +1123,11 @@ RB_SetGL2D
 ================
 */
 void    RB_SetGL2D( void ) {
+
 	backEnd.projection2D = qtrue;
 
 	// set 2D virtual screen size
-	qglViewport( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
+/*	qglViewport(0, 0, glConfig.vidWidth, glConfig.vidHeight);
 	qglScissor( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
 	qglMatrixMode( GL_PROJECTION );
 	qglLoadIdentity();
@@ -1122,7 +1146,7 @@ void    RB_SetGL2D( void ) {
 
 	// set time for 2D shaders
 	backEnd.refdef.time = ri.Milliseconds();
-	backEnd.refdef.floatTime = backEnd.refdef.time * 0.001f;
+	backEnd.refdef.floatTime = backEnd.refdef.time * 0.001f;*/
 }
 
 
@@ -1136,6 +1160,7 @@ Used for cinematics.
 =============
 */
 void RE_StretchRaw( int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty ) {
+	/*AKX*/
 	int i, j;
 	int start, end;
 
@@ -1417,7 +1442,7 @@ const void  *RB_DrawSurfs( const void *data ) {
 	}
 
 	cmd = (const drawSurfsCommand_t *)data;
-
+	//AKA tutaj vierParams
 	backEnd.refdef = cmd->refdef;
 	backEnd.viewParms = cmd->viewParms;
 
@@ -1461,6 +1486,9 @@ Also called by RE_EndRegistration
 */
 void RB_ShowImages( void ) {
 	int i;
+
+
+
 	image_t *image;
 	float x, y, w, h;
 	int start, end;
@@ -1583,6 +1611,8 @@ void RB_ExecuteRenderCommands( const void *data ) {
 	} else {
 		backEnd.smpFrame = 1;
 	}
+
+	printf("test");
 
 	while ( 1 ) {
 		switch ( *(const int *)data ) {

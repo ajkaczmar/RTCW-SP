@@ -134,6 +134,7 @@ void RB_AddFlare( void *surface, int fogNum, vec3_t point, vec3_t color, float s
 
 	// if the point is off the screen, don't bother adding it
 	// calculate screen coordinates and depth
+	//AKA chyba tylko tutaj zmieniane or.modelMatrix
 	R_TransformModelToClip( point, backEnd.or.modelMatrix,
 							backEnd.viewParms.projectionMatrix, eye, clip );
 
@@ -477,8 +478,8 @@ void RB_RenderFlares( void ) {
 	}
 
 	// (SA) turned light flares back on.  must evaluate problem id had with this
-	RB_AddDlightFlares();
-	RB_AddCoronaFlares();
+	//AKA RB_AddDlightFlares();
+	//AKA RB_AddCoronaFlares();
 
 	// perform z buffer readback on each flare in this view
 	draw = qfalse;

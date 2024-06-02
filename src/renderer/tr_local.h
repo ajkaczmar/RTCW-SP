@@ -302,7 +302,7 @@ typedef struct {
 	qboolean isVideoMap;
 } textureBundle_t;
 
-#define NUM_TEXTURE_BUNDLES 2
+#define NUM_TEXTURE_BUNDLES 4
 
 typedef struct {
 	qboolean active;
@@ -648,6 +648,7 @@ typedef struct srfGridMesh_s {
 typedef struct {
 	surfaceType_t surfaceType;
 	cplane_t plane;
+	int vboIdx;
 
 	// dynamic lighting information
 	int dlightBits[SMP_FRAMES];
@@ -1044,6 +1045,24 @@ typedef struct {
 	// RF, temp var used while parsing shader only
 	int allowCompress;
 
+	GLuint tessProgram;
+	GLint glsl_tess_model;
+	GLint glsl_tess_view;
+	GLint glsl_tess_projection;
+	GLint tess_p1;
+	GLint tess_p2;
+	GLint tess_p3;
+	GLint tess_p4;
+	GLint tess_p5;
+	GLint tess_p6;
+
+	//glslparams
+	GLuint glslProgram;
+	GLint glsl_p_tex1;
+	GLint glsl_p_tex2;	
+	GLint glsl_m_model;
+	GLint glsl_m_view;
+	GLint glsl_m_projection;
 } trGlobals_t;
 
 extern backEndState_t backEnd;
@@ -1788,6 +1807,8 @@ shader_t *R_FindCachedShader( const char *name, int lightmapIndex, int hash );
 void R_BackupShaders( void );
 void R_PurgeShaders( int count );
 void R_LoadCacheShaders( void );
+GLuint R_CompileTessShader();
+GLuint R_CompileTex0Shader();
 // done.
 
 //------------------------------------------------------------------------------

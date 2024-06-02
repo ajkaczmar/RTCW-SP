@@ -750,10 +750,12 @@ void R_ScreenShotJPEG_f( void ) {
 ** GL_SetDefaultState
 */
 void GL_SetDefaultState( void ) {
+
+	
 	qglClearDepth( 1.0f );
 
 	qglCullFace( GL_FRONT );
-
+	/*AKX*/
 	qglColor4f( 1,1,1,1 );
 
 	// initialize downstream texture unit if we're running
@@ -768,13 +770,16 @@ void GL_SetDefaultState( void ) {
 
 	qglEnable( GL_TEXTURE_2D );
 	GL_TextureMode( r_textureMode->string );
+	//AKA-X 
 	GL_TexEnv( GL_MODULATE );
 
+	//AKA-X 
 	qglShadeModel( GL_SMOOTH );
 	qglDepthFunc( GL_LEQUAL );
 
 	// the vertex array is always enabled, but the color and texture
 	// arrays are enabled and disabled around the compiled vertex array call
+	//aka-x
 	qglEnableClientState( GL_VERTEX_ARRAY );
 
 	//
@@ -1127,8 +1132,7 @@ void R_Register( void ) {
 	r_shownormals = ri.Cvar_Get( "r_shownormals", "0", CVAR_CHEAT );
 	r_clear = ri.Cvar_Get( "r_clear", "0", CVAR_CHEAT );
 	r_offsetFactor = ri.Cvar_Get( "r_offsetfactor", "-1", CVAR_CHEAT );
-	r_offsetUnits = ri.Cvar_Get( "r_offsetunits", "-2", CVAR_CHEAT );
-	r_drawBuffer = ri.Cvar_Get( "r_drawBuffer", "GL_BACK", CVAR_CHEAT );
+	r_offsetUnits = ri.Cvar_Get( "r_offsetunits", "-2", CVAR_CHEAT ); r_drawBuffer = ri.Cvar_Get( "r_drawBuffer", "GL_BACK", CVAR_CHEAT );
 	r_lockpvs = ri.Cvar_Get( "r_lockpvs", "0", CVAR_CHEAT );
 	r_noportals = ri.Cvar_Get( "r_noportals", "0", CVAR_CHEAT );
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
@@ -1236,8 +1240,6 @@ void R_Init( void ) {
 
 	R_InitImages();
 
-
-
 	R_InitShaders();
 
 	R_InitSkins();
@@ -1335,7 +1337,7 @@ Touch all images to make sure they are resident
 void RE_EndRegistration( void ) {
 	R_SyncRenderThread();
 	if ( !Sys_LowPhysicalMemory() ) {
-		RB_ShowImages();
+		//AKA RB_ShowImages();
 	}
 }
 

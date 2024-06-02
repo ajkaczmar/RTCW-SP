@@ -118,6 +118,8 @@ static qboolean R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
 	if ( r_nocull->integer ) {
 		return qfalse;
 	}
+	if (!surface)
+		return qtrue;
 
 	if ( *surface == SF_GRID ) {
 		return R_CullGrid( (srfGridMesh_t *)surface );
@@ -422,7 +424,7 @@ static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits )
 
 		if ( !r_nocull->integer ) {
 			int r;
-
+			/*AKA NO CULL*/
 			if ( planeBits & 1 ) {
 				r = BoxOnPlaneSide( node->mins, node->maxs, &tr.viewParms.frustum[0] );
 				if ( r == 2 ) {
@@ -453,12 +455,12 @@ static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits )
 				}
 			}
 
-			if ( planeBits & 8 ) {
-				r = BoxOnPlaneSide( node->mins, node->maxs, &tr.viewParms.frustum[3] );
-				if ( r == 2 ) {
+			if (planeBits & 8) {
+				r = BoxOnPlaneSide(node->mins, node->maxs, &tr.viewParms.frustum[3]);
+				if (r == 2) {
 					return;                     // culled
 				}
-				if ( r == 1 ) {
+				if (r == 1) {
 					planeBits &= ~8;            // all descendants will also be in front
 				}
 			}
@@ -610,6 +612,7 @@ static void R_MarkLeaves( void ) {
 	mnode_t *leaf, *parent;
 	int i;
 	int cluster;
+
 
 	// lockpvs lets designers walk around to determine the
 	// extent of the current pvs
