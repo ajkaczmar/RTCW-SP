@@ -1107,6 +1107,14 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	int numPoints;
 	int dlightBits;
 
+
+	tess.numIndexes += surf->numIndices;
+	tess.vbos[tess.numVBO] = surf->vboIdx;
+	tess.idxnum[tess.numVBO] = surf->numIndices;
+	tess.numVBO++;
+	if (surf->vboIdx)
+		return;
+
 	RB_CHECKOVERFLOW( surf->numPoints, surf->numIndices );
 
 	dlightBits = surf->dlightBits[backEnd.smpFrame];
@@ -1119,8 +1127,6 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	for ( i = surf->numIndices - 1 ; i >= 0  ; i-- ) {
 		tessIndexes[i] = indices[i] + Bob;
 	}
-
-	tess.numIndexes += surf->numIndices;
 
 	v = surf->points[0];
 

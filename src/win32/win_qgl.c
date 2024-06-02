@@ -428,6 +428,7 @@ void (APIENTRY* qglUseProgram)(GLint location, GLfloat v0);
 GLint (APIENTRY* qglGetUniformLocation)(GLuint program, const GLchar* name);
 void (APIENTRY* qglBindVertexArray)(GLuint array);
 void (APIENTRY* qglBindBuffer)(GLenum target, GLuint buffer);
+void (APIENTRY* qglEnableVertexAttribArray)(GLuint index);
 void (APIENTRY* qglBufferData)(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
 void (APIENTRY* qglGenBuffers)(GLsizei n, GLuint* buffers);
 void (APIENTRY* qglGenVertexArrays)(GLsizei n, GLuint* arrays);

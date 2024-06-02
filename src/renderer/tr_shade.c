@@ -335,6 +335,7 @@ void RB_BeginSurface( shader_t *shader, int fogNum ) {
 	tess.ATI_tess = qfalse;     //----(SA)	added
 	tess.numIndexes = 0;
 	tess.numVertexes = 0;
+	tess.numVBO = 0;
 	tess.shader = state;
 	tess.fogNum = fogNum;
 	tess.dlightBits = 0;        // will be OR'd in by surface functions
@@ -430,6 +431,69 @@ static void DrawTesselated(shaderCommands_t* input, int stage) {
 	qglUseProgram(0);
 }
 
+void DrawGLSL_VBO(int stage, int vbo, int numIndexes) {
+	shaderStage_t* pStage;
+
+	pStage = tess.xstages[stage];
+
+	//GL_State(pStage->stateBits);
+
+	// this is an ugly hack to work around a GeForce driver
+	// bug with multitexture and clip planes
+	if (backEnd.viewParms.isPortal) {
+		qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
+	//unsigned int VAO;
+	//glGenVertexArrays(1, &VAO);
+
+	//
+	// base
+	//
+	GL_SelectTexture(0);
+//	qglTexCoordPointer(2, GL_FLOAT, 0, input->svars.texcoords[0]);
+	R_BindAnimatedImage(&pStage->bundle[0]);
+
+	//
+	// lightmap/secondary pass
+	//
+	//GL_SelectTexture(1);
+	//qglEnable(GL_TEXTURE_2D);
+	//qglEnableClientState(GL_TEXTURE_COORD_ARRAY);//aka-x
+
+	//AKA-X
+	//qglTexCoordPointer(2, GL_FLOAT, 0, input->svars.texcoords[1]);
+
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
+
+	qglDisableClientState(GL_VERTEX_ARRAY);
+	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	qglDisableClientState(GL_COLOR_ARRAY);
+	qglDisableClientState(GL_NORMAL_ARRAY);
+
+	R_BindAnimatedImage(&pStage->bundle[1]);
+
+	qglUseProgram(tr.glslProgram);
+
+	qglUniformMatrix4fv(tr.glsl_m_projection, 1, GL_FALSE, &backEnd.viewParms.projectionMatrix[0]);
+	qglUniformMatrix4fv(tr.glsl_m_view, 1, GL_FALSE, &backEnd. or .modelMatrix[0]);
+	qglUniform1i(tr.glsl_p_tex1, 0);
+
+	//R_DrawElements(input->numIndexes, input->indexes);
+	qglBindVertexArray(vbo);
+	qglDrawElements(GL_TRIANGLES, numIndexes, GL_UNSIGNED_INT, 0);
+
+	//
+	// disable texturing on TEXTURE1, then select TEXTURE0
+	//
+	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	qglDisable(GL_TEXTURE_2D);
+
+	GL_SelectTexture(0);
+
+	qglUseProgram(0);
+}
 
 static void DrawGLSL(shaderCommands_t* input, int stage) {
 	shaderStage_t* pStage;
@@ -1797,6 +1861,14 @@ void RB_EndSurface( void ) {
 
 	input = &tess;
 
+	if (input->numVBO) {
+		for (int i = 0; i < input->numVBO; i++) {
+			DrawGLSL_VBO(0, input->vbos[i], input->idxnum[i]);
+		}
+		tess.numVBO = 0;
+		return;
+	}
+
 	if ( input->numIndexes == 0 ) {
 		return;
 	}
@@ -1861,7 +1933,7 @@ void RB_EndSurface( void ) {
 
 	// clear shader so we can tell we don't have any unclosed surfaces
 	tess.numIndexes = 0;
-
+	tess.numVBO = 0;
 	GLimp_LogComment( "----------\n" );
 }
 

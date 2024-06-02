@@ -416,7 +416,7 @@ static void AutospriteDeform( void ) {
 	oldVerts = tess.numVertexes;
 	tess.numVertexes = 0;
 	tess.numIndexes = 0;
-
+	tess.numVBO = 0;
 	if ( backEnd.currentEntity != &tr.worldEntity ) {
 		GlobalVectorToLocal( backEnd.viewParms.or.axis[1], leftDir );
 		GlobalVectorToLocal( backEnd.viewParms.or.axis[2], upDir );

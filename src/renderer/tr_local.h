@@ -1431,6 +1431,10 @@ typedef struct shaderCommands_s
 	color4ub_t vertexColors[SHADER_MAX_VERTEXES];
 	int vertexDlightBits[SHADER_MAX_VERTEXES];
 
+	int vbos[100000];
+	int idxnum[100000];
+	int numVBO;
+
 	stageVars_t svars;
 
 	color4ub_t constantColor255[SHADER_MAX_VERTEXES];

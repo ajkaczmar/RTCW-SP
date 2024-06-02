@@ -382,9 +382,9 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int 
 	numIndexes = LittleLong( ds->numIndexes );
 
 	// create the srfSurfaceFace_t
-	sfaceSize = ( int ) &( (srfSurfaceFace_t *)0 )->points[numPoints];
-	ofsIndexes = sfaceSize;
-	sfaceSize += sizeof( int ) * numIndexes;
+	sfaceSize = ( int ) &( (srfSurfaceFace_t *)0 )->points[numPoints];//aka ile zajmuja vertex'y
+	ofsIndexes = sfaceSize; //aka zapisz miejsce za vertexami - czyli start indeksow
+	sfaceSize += sizeof( int ) * numIndexes; // aka dodaj ile zajmuja indeksy - ponizej alokacja
 
 	//cv = ri.Hunk_Alloc( sfaceSize );
 	cv = R_GetSurfMemory( sfaceSize );
@@ -406,6 +406,10 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int 
 		R_ColorShiftLightingBytes( verts[i].color, (byte *)&cv->points[i][7] );
 	}
 
+	void* d = &(cv->points[0]);
+		void* e = &(cv->points[1]);
+		int s = sizeof(cv->points[0]);
+
 	indexes += LittleLong( ds->firstIndex );
 	for ( i = 0 ; i < numIndexes ; i++ ) {
 		( ( int * )( (byte *)cv + cv->ofsIndices ) )[i] = LittleLong( indexes[ i ] );
@@ -420,48 +424,33 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int 
 	cv->plane.type = PlaneTypeForNormal( cv->plane.normal );
 
 	surf->data = (surfaceType_t *)cv;
-	/*
-	qglGenVertexArrays(1, &cv->vboIdx);
-	qglBindVertexArray(cv->vboIdx);
-
-	unsigned int vbo, ibo;
-	qglGenBuffers(1, &vbo);
-	qglGenBuffers(1, &ibo);
 	
-	qglBindBuffer(GL_ARRAY_BUFFER, vbo);
-	qglBufferData(GL_ARRAY_BUFFER, numPoints, &(cv->points[0][0]), GL_STATIC_DRAW);
-
-	qglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo);
-	//qglBufferData(GL_ELEMENT_ARRAY_BUFFER, cv->numIndices, .poin, GL_STATIC_DRAW);
-	*/
-
-	//glEnableVertexAttribArray(0);
-
-	//glEnableVertexAttribArray(1);
-
-	//glEnableVertexAttribArray(2);
-	//
-	/*
-	unsigned int VBO[2];
-	glGenBuffers(2, VBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(texcords), texcords, GL_STATIC_DRAW);
-
 	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	qglGenVertexArrays(1, &VAO);
+	qglBindVertexArray(VAO);
+	
+	unsigned int IBO;
+	qglGenBuffers(1, &IBO);
+	qglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	qglBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndexes * 3 * sizeof(int), &(((int*)((byte*)cv + cv->ofsIndices))[0]), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);*/
+	unsigned int VBO;
+	qglGenBuffers(1, &VBO);
+
+	qglBindBuffer(GL_ARRAY_BUFFER, VBO);
+	qglBufferData(GL_ARRAY_BUFFER, numPoints * 8 * sizeof(float), &(cv->points[0][0]), GL_STATIC_DRAW);
+
+	qglBindBuffer(GL_ARRAY_BUFFER, VBO);
+	qglEnableVertexAttribArray(0);
+	qglVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	qglEnableVertexAttribArray(1);
+	qglVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
+	qglEnableVertexAttribArray(2);
+	qglVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)((3+2)*sizeof(float)));
+	cv->vboIdx = VAO;
+
+	qglBindVertexArray(0);
 }
 
 /*

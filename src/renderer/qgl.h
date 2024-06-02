@@ -584,6 +584,7 @@ extern void (APIENTRY* qglGetProgramiv)(GLuint program, GLenum pname, GLint* par
 extern void (APIENTRY* qglGetProgramInfoLog)(GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog);
 extern void (APIENTRY* qglBindVertexArray)(GLuint array);
 extern void (APIENTRY* qglBindBuffer)(GLenum target, GLuint buffer);
+extern void (APIENTRY* qglEnableVertexAttribArray)(GLuint index);
 extern void (APIENTRY* qglBufferData)(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
 extern void (APIENTRY* qglGenBuffers)(GLsizei n, GLuint* buffers);
 extern void (APIENTRY* qglGenVertexArrays)(GLsizei n, GLuint* arrays);

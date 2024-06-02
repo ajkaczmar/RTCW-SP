@@ -1210,6 +1210,7 @@ static void GLW_InitExtensions( void ) {
 	qglDeleteVertexArrays = WGLGPA("glDeleteVertexArrays");
 	qglBindVertexArray = WGLGPA("glBindVertexArray");
 	qglBindBuffer = WGLGPA("glBindBuffer");
+	qglEnableVertexAttribArray = WGLGPA("glEnableVertexAttribArray");
 	qglBufferData = WGLGPA("glBufferData");
 	qglGenBuffers = WGLGPA("glGenBuffers");
 	qglGenVertexArrays = WGLGPA("glGenVertexArrays");
