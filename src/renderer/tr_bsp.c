@@ -444,8 +444,8 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int 
 	qglBindBuffer(GL_ARRAY_BUFFER, VBO);
 	qglEnableVertexAttribArray(0);
 	qglVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	qglEnableVertexAttribArray(1);
-	qglVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
+	qglEnableVertexAttribArray(8);
+	qglVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
 	qglEnableVertexAttribArray(2);
 	qglVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)((3+2)*sizeof(float)));
 	cv->vboIdx = VAO;

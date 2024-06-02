@@ -436,6 +436,7 @@ void DrawGLSL_VBO(int stage, int vbo, int numIndexes) {
 
 	pStage = tess.xstages[stage];
 
+
 	//GL_State(pStage->stateBits);
 
 	// this is an ugly hack to work around a GeForce driver
@@ -446,12 +447,13 @@ void DrawGLSL_VBO(int stage, int vbo, int numIndexes) {
 
 	//unsigned int VAO;
 	//glGenVertexArrays(1, &VAO);
-
+	qglEnable(GL_TEXTURE_2D);
 	//
 	// base
 	//
+	qglActiveTextureARB(GL_TEXTURE0_ARB);
+	qglClientActiveTextureARB(GL_TEXTURE0_ARB);
 	GL_SelectTexture(0);
-//	qglTexCoordPointer(2, GL_FLOAT, 0, input->svars.texcoords[0]);
 	R_BindAnimatedImage(&pStage->bundle[0]);
 
 	//
@@ -472,7 +474,7 @@ void DrawGLSL_VBO(int stage, int vbo, int numIndexes) {
 	qglDisableClientState(GL_COLOR_ARRAY);
 	qglDisableClientState(GL_NORMAL_ARRAY);
 
-	R_BindAnimatedImage(&pStage->bundle[1]);
+	//R_BindAnimatedImage(&pStage->bundle[1]);
 
 	qglUseProgram(tr.glslProgram);
 
@@ -523,7 +525,7 @@ static void DrawGLSL(shaderCommands_t* input, int stage) {
 	//
 	GL_SelectTexture(1);
 	qglEnable(GL_TEXTURE_2D);
-	qglEnableClientState(GL_TEXTURE_COORD_ARRAY);//aka-x
+	//qglEnableClientState(GL_TEXTURE_COORD_ARRAY);//aka-x
 
 	//AKA-X
 
@@ -1385,13 +1387,18 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input ) {
 		//
 		if (pStage->bundle[0].image[0] != 0 && strstr(pStage->bundle[0].image[0]->imgName, "anatom")) {
 
-			/*qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			DrawTesselated(input, stage);
-			qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			/*DrawTesselated(input, stage);
 			*/
 			DrawGLSL(input, stage);
+
+			qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		} else if ( pStage->bundle[1].image[0] != 0 ) {
+
+			qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			DrawGLSL(input, stage); //DrawMultitextured( input, stage );
+
+			qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		} else
 		{
 			//return; //aka-x
@@ -1515,7 +1522,7 @@ void RB_StageIteratorGeneric( void ) {
 	/*AKA - tutaj glitch przy nanoszonych obrazkach - tzw decals i lightmapach */
 	if ( input->shader->polygonOffset ) {
 		qglEnable( GL_POLYGON_OFFSET_FILL );
-		qglPolygonOffset( r_offsetFactor->value, r_offsetUnits->value );
+		qglPolygonOffset( r_offsetFactor->value, r_offsetUnits->value );	
 	}
 
 	//
@@ -1533,11 +1540,11 @@ void RB_StageIteratorGeneric( void ) {
 	{
 		setArraysOnce = qtrue;
 
-		qglEnableClientState( GL_COLOR_ARRAY );
-		qglColorPointer( 4, GL_UNSIGNED_BYTE, 0, tess.svars.colors );
+		//qglEnableClientState( GL_COLOR_ARRAY );
+	///	qglColorPointer( 4, GL_UNSIGNED_BYTE, 0, tess.svars.colors );
 
-		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-		qglTexCoordPointer( 2, GL_FLOAT, 0, tess.svars.texcoords[0] );
+		//qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+		///qglTexCoordPointer( 2, GL_FLOAT, 0, tess.svars.texcoords[0] );
 	}
 
 	// RF, send normals only if required
@@ -1561,8 +1568,8 @@ void RB_StageIteratorGeneric( void ) {
 	// enable color and texcoord arrays after the lock if necessary
 	//
 	if ( !setArraysOnce ) {
-		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );//AKA-X
-		qglEnableClientState( GL_COLOR_ARRAY );
+		//qglEnableClientState( GL_TEXTURE_COORD_ARRAY );//AKA-X
+		//qglEnableClientState( GL_COLOR_ARRAY );
 	}
 
 	//
@@ -1862,9 +1869,15 @@ void RB_EndSurface( void ) {
 	input = &tess;
 
 	if (input->numVBO) {
+
+		qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		
+		
 		for (int i = 0; i < input->numVBO; i++) {
 			DrawGLSL_VBO(0, input->vbos[i], input->idxnum[i]);
 		}
+		qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 		tess.numVBO = 0;
 		return;
 	}

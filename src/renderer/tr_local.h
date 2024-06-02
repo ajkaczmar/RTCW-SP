@@ -1641,6 +1641,8 @@ void    RB_CalcDiffuseColor( unsigned char *colors );
 void    RB_ZombieFXInit( void );
 void    RB_ZombieFXAddNewHit( int entityNum, const vec3_t hitPos, const vec3_t hitDir );
 
+//GLSL
+void DrawGLSL_VBO(int stage, int vbo, int numIndexes);
 
 /*
 =============================================================
