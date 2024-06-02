@@ -33,114 +33,124 @@ If you have questions concerning this license or the applicable additional terms
 
 // *************************** Tess shaders *******************************
 
-
-char* fs_shader = "#version 410 core\n"
+char* fs_shader = 
+"#version 410 core\n"
+""
 "in float Height;"
+""
 "out vec4 FragColor;"
+""
 "void main()"
 "{"
-"	//float h = (Height + 16) / 64.0f;\n"
-"	FragColor = vec4(1.0, 1.0, 1.0, 1.0);"
+"    float h = 1.0;"
+"    FragColor = vec4(h, 0.0, 0.0, 1.0);"
 "}";
+// (Height + 16)/64.0f;"
 
-char* tcs_shader = "#version 410 core\n"
-"layout(vertices = 4) out;"
+char* tcs_shader = 
+"#version 410 core\n"
+""
+"layout(vertices=3) out;"
+""
 "uniform mat4 view;"
+""
 "in vec2 TexCoord[];"
-"out vec2 TextureCoord[]; "
+"out vec2 TextureCoord[];"
+""
 "void main()"
 "{"
-"	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;"
-"	TextureCoord[gl_InvocationID] = TexCoord[gl_InvocationID];"
+"    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;"
+"    TextureCoord[gl_InvocationID] = TexCoord[gl_InvocationID];"
 ""
-"	if (gl_InvocationID == 0)"
-"	{"
-"		const int MIN_TESS_LEVEL = 4;"
-"		const int MAX_TESS_LEVEL = 64;"
-"		const float MIN_DISTANCE = 20;"
-"		const float MAX_DISTANCE = 800;"
+"    if(gl_InvocationID == 0)"
+"    {"
+"        const int MIN_TESS_LEVEL = 16;"
+"        const int MAX_TESS_LEVEL = 64;"
+"        const float MIN_DISTANCE = 20;"
+"        const float MAX_DISTANCE = 800;"
 ""
-"		vec4 eyeSpacePos00 = view * gl_in[0].gl_Position;"
-"		vec4 eyeSpacePos01 = view * gl_in[1].gl_Position;"
-"		vec4 eyeSpacePos10 = view * gl_in[2].gl_Position;"
-"		vec4 eyeSpacePos11 = view * gl_in[3].gl_Position;"
+"        vec4 eyeSpacePos00 = view * gl_in[0].gl_Position;"
+"        vec4 eyeSpacePos01 = view * gl_in[1].gl_Position;"
+"        vec4 eyeSpacePos10 = view * gl_in[2].gl_Position;"
+"        vec4 eyeSpacePos11 = view * gl_in[3].gl_Position;"
 ""
-"		float distance00 = clamp((abs(eyeSpacePos00.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);"
-"		float distance01 = clamp((abs(eyeSpacePos01.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);"
-"		float distance10 = clamp((abs(eyeSpacePos10.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);"
-"		float distance11 = clamp((abs(eyeSpacePos11.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);"
+"      "
+"        float distance00 = clamp( (abs(eyeSpacePos00.z) - MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0 );"
+"        float distance01 = clamp( (abs(eyeSpacePos01.z) - MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0 );"
+"        float distance10 = clamp( (abs(eyeSpacePos10.z) - MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0 );"
+"        float distance11 = clamp( (abs(eyeSpacePos11.z) - MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0 );"
 ""
-"		float tessLevel0 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance10, distance00));"
-"		float tessLevel1 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance00, distance01));"
-"		float tessLevel2 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance01, distance11));"
-"		float tessLevel3 = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance11, distance10));"
+"        float tessLevel0 = mix( MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance10, distance00) );"
+"        float tessLevel1 = mix( MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance00, distance01) );"
+"        float tessLevel2 = mix( MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance01, distance11) );"
+"        float tessLevel3 = mix( MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance11, distance10) );"
 ""
-"		gl_TessLevelOuter[0] = tessLevel0;"
-"		gl_TessLevelOuter[1] = tessLevel1;"
-"		gl_TessLevelOuter[2] = tessLevel2;"
-"		gl_TessLevelOuter[3] = tessLevel3;"
+"        gl_TessLevelOuter[0] = tessLevel0;"
+"        gl_TessLevelOuter[1] = tessLevel1;"
+"        gl_TessLevelOuter[2] = tessLevel2;"
+"        gl_TessLevelOuter[3] = tessLevel3;"
 ""
-"		gl_TessLevelInner[0] = max(tessLevel1, tessLevel3);"
-"		gl_TessLevelInner[1] = max(tessLevel0, tessLevel2);"
-"	}"
+"        gl_TessLevelInner[0] = max(tessLevel1, tessLevel3);"
+"        gl_TessLevelInner[1] = max(tessLevel0, tessLevel2);"
+"    }"
 "}";
 
-char* tes_shader = "#version 410 core\n"
-"layout(quads, fractional_odd_spacing, ccw) in;"
+
+char* tes_shader = 
+"#version 410 core\n"
+"layout(triangles, equal_spacing, ccw) in;"
 ""
 "uniform sampler2D heightMap;"
 "uniform mat4 view;"
 "uniform mat4 projection;"
 ""
 "in vec2 TextureCoord[];"
+""
 "out float Height;"
 ""
 "void main()"
 "{"
-"	float u = gl_TessCoord.x;"
-"	float v = gl_TessCoord.y;"
+"    float u = gl_TessCoord.x;"
+"    float v = gl_TessCoord.y;"
 ""
-"	vec2 t00 = TextureCoord[0];"
-"	vec2 t01 = TextureCoord[1];"
-"	vec2 t10 = TextureCoord[2];"
-"	vec2 t11 = TextureCoord[3];"
+"    vec2 t00 = TextureCoord[0];"
+"    vec2 t01 = TextureCoord[1];"
+"    vec2 t10 = TextureCoord[2];"
+"    vec2 t11 = TextureCoord[3];"
 ""
-"	vec2 t0 = (t01 - t00) * u + t00;"
-"	vec2 t1 = (t11 - t10) * u + t10;"
-"	vec2 texCoord = (t1 - t0) * v + t0;"
+"    vec2 t0 = (t01 - t00) * u + t00;"
+"    vec2 t1 = (t11 - t10) * u + t10;"
+"    vec2 texCoord = (t1 - t0) * v + t0;"
 ""
-"	Height = 1.0;//texture(heightMap, texCoord).y * 64.0 - 16.0;\n"
+"    Height = 1.0;"
 ""
-"	vec4 p00 = gl_in[0].gl_Position;"
-"	vec4 p01 = gl_in[1].gl_Position;"
-"	vec4 p10 = gl_in[2].gl_Position;"
-"	vec4 p11 = gl_in[3].gl_Position;"
+"    vec4 p00 = gl_in[0].gl_Position;"
+"    vec4 p01 = gl_in[1].gl_Position;"
+"    vec4 p10 = gl_in[2].gl_Position;"
+"    vec4 p11 = gl_in[3].gl_Position;"
 ""
-"	vec4 uVec = p01 - p00;"
-"	vec4 vVec = p10 - p00;"
-"	vec4 normal = normalize(vec4(cross(vVec.xyz, uVec.xyz), 0));"
+"    vec4 uVec = p01 - p00;"
+"    vec4 vVec = p10 - p00;"
+"    vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );"
 ""
-"	vec4 p0 = (p01 - p00) * u + p00;"
-"	vec4 p1 = (p11 - p10) * u + p10;"
-"	vec4 p = (p1 - p0) * v + p0 + normal * Height;"
+"    vec4 p0 = (p01 - p00) * u + p00;"
+"    vec4 p1 = (p11 - p10) * u + p10;"
+"    vec4 p = (p1 - p0) * v + p0 + normal * Height;"
 ""
-"	gl_Position = projection * view * p;"
+"    gl_Position = projection * view * p;"
 "}";
 
-
-char* vs_shader = "#version 410 core\n"
-"layout(location = 0) in vec3 aPos;"
-"layout(location = 8) in vec2 aTex;"
+char* vs_shader = 
+"#version 410 core\n"
+"layout (location = 0) in vec3 aPos;"
+"layout (location = 8) in vec2 aTex;"
 ""
 "out vec2 TexCoord;"
 ""
-"uniform mat4 view;\n"
-"uniform mat4 projection;\n"
-""
 "void main()"
 "{"
-"	gl_Position = vec4(aPos, 1.0);\n"
-"	TexCoord = aTex;"
+"    gl_Position = vec4(aPos, 1.0);"
+"    TexCoord = aTex;"
 "}";
 
 // *************************** Tess shaders *******************************
@@ -153,7 +163,7 @@ char* fs_tx0 = "#version 330 core\n"
 ""
 "void main()"
 "{"
-"	FragColor = texture(texture1, TexCoord);"// vec4(texture(texture1, TexCoord), 1.0f);" //mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);"
+"	FragColor = texture(texture1, TexCoord);"
 "}\n";
 
 
@@ -173,7 +183,32 @@ char* vs_tx0 = "#version 330 core\n"
 "	TexCoord = vec2(aTexCoord.x, aTexCoord.y);"
 "}\n";
 
+char* fs_red = "#version 330 core\n"
+"out vec4 FragColor;"
+"in vec2 TexCoord;"
+"uniform sampler2D texture1;"
+"uniform sampler2D texture2;"
+""
+"void main()"
+"{"
+"	FragColor = vec4(1.0, 0.0,0.0, 1.0);"
+"}\n";
 
+char* vs_red = "#version 330 core\n"
+"layout(location = 0) in vec3 aPos;\n"
+"layout(location = 8) in vec2 aTexCoord;\n"
+"\n"
+"out vec2 TexCoord;\n"
+"\n"
+"uniform mat4 modelx;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+"\n"
+"void main()"
+"{"
+"	gl_Position = projection * view * vec4(aPos, 1.0f);"
+"	TexCoord = vec2(aTexCoord.x, aTexCoord.y);"
+"}\n";
 
 static char *s_shaderText;
 
@@ -185,6 +220,8 @@ static texModInfo_t texMods[MAX_SHADER_STAGES][TR_MAX_TEXMODS];
 static qboolean deferLoad;
 
 #define FILE_HASH_SIZE      4096
+
+#define GL_PATCH_VERTICES 0x8E72
 
 static shader_t*       hashTable[FILE_HASH_SIZE];
 
@@ -3453,6 +3490,10 @@ void R_InitShaders( void ) {
 	tr.tessProgram = R_CompileTessShader();
 
 	tr.glslProgram = R_CompileTex0Shader();
+
+	tr.redProgram = R_Compile_Red();
+
+	qglPatchParameteri(GL_PATCH_VERTICES, 3);
 }
 
 void checkCompileErrors(GLuint shader, char* type)
@@ -3486,6 +3527,7 @@ void checkCompileErrors(GLuint shader, char* type)
 #define GL_TESS_CONTROL_SHADER 0x8E88
 #define GL_VERTEX_SHADER 0x8B31
 #define GL_FRAGMENT_SHADER 0x8B30
+#define GL_MAX_TESS_GEN_LEVEL 0x8E7E
 
 GLuint R_CompileTessShader() {
 	unsigned int vertex, fragment;
@@ -3501,11 +3543,11 @@ GLuint R_CompileTessShader() {
 	checkCompileErrors(fragment, "FRAGMENT");
 	
 	// if tessellation shader is given, compile tessellation shader
-	/*unsigned int tessControl;
+	unsigned int tessControl;
 	tessControl = qglCreateShader(GL_TESS_CONTROL_SHADER);
 	qglShaderSource(tessControl, 1, &tcs_shader, NULL);
 	qglCompileShader(tessControl);
-	checkCompileErrors(tessControl, "TESS_CONTROL");*/
+	checkCompileErrors(tessControl, "TESS_CONTROL");
 
 	unsigned int tessEval;
 	tessEval = qglCreateShader(GL_TESS_EVALUATION_SHADER);
@@ -3517,7 +3559,7 @@ GLuint R_CompileTessShader() {
 	GLuint ID = qglCreateProgram();
 	qglAttachShader(ID, vertex);
 	qglAttachShader(ID, fragment);		
-	//qglAttachShader(ID, tessControl);
+	qglAttachShader(ID, tessControl);
 	qglAttachShader(ID, tessEval);
 
 	qglLinkProgram(ID);
@@ -3525,14 +3567,18 @@ GLuint R_CompileTessShader() {
 	// delete the shaders as they're linked into our program now and no longer necessery
 	qglDeleteShader(vertex);
 	qglDeleteShader(fragment);//pozostale dodac
-	//qglDeleteShader(tessControl);
+	qglDeleteShader(tessControl);
 	qglDeleteShader(tessEval);
 
+	qglUseProgram(ID);
 	tr.glsl_tess_view = qglGetUniformLocation(ID, "view");
 	tr.glsl_tess_projection = qglGetUniformLocation(ID, "projection");
 	//tr.glsl_tess_tex1 = qglGetUniformLocation(ID, "texture1");
 
 	qglUseProgram(0);
+
+	GLint maxTessLevel;
+	qglGetIntegerv(GL_MAX_TESS_GEN_LEVEL, &maxTessLevel);
 
 	return ID;
 }
@@ -3571,3 +3617,39 @@ GLuint R_CompileTex0Shader() {
 
 	return ID;
 }
+
+
+GLuint R_Compile_Red() {
+	unsigned int vertex, fragment;
+
+	vertex = qglCreateShader(GL_VERTEX_SHADER);
+	qglShaderSource(vertex, 1, &vs_red, NULL);
+	qglCompileShader(vertex);
+	checkCompileErrors(vertex, "VERTEX");
+	// fragment Shader
+	fragment = qglCreateShader(GL_FRAGMENT_SHADER);
+	qglShaderSource(fragment, 1, &fs_red, NULL);
+	qglCompileShader(fragment);
+	checkCompileErrors(fragment, "FRAGMENT");
+
+	// shader Program
+	GLuint ID = qglCreateProgram();
+	qglAttachShader(ID, vertex);
+	qglAttachShader(ID, fragment);
+
+	qglLinkProgram(ID);
+	checkCompileErrors(ID, "PROGRAM");
+	// delete the shaders as they're linked into our program now and no longer necessery
+	qglDeleteShader(vertex);
+	qglDeleteShader(fragment);
+
+	qglUseProgram(ID);
+
+	tr.red_m_view = qglGetUniformLocation(ID, "view");
+	tr.red_m_projection = qglGetUniformLocation(ID, "projection");
+
+	qglUseProgram(0);
+
+	return ID;
+}
+

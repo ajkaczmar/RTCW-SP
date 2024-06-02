@@ -520,11 +520,11 @@ void RB_RenderFlares( void ) {
 		qglDisable( GL_CLIP_PLANE0 );
 	}
 
-	qglPushMatrix();
-	qglLoadIdentity();
-	qglMatrixMode( GL_PROJECTION );
-	qglPushMatrix();
-	qglLoadIdentity();
+	//AKA-X qglPushMatrix();
+	//AKA-X qglLoadIdentity();
+	//AKA-X qglMatrixMode( GL_PROJECTION );
+	//AKA-X qglPushMatrix();
+	//AKA-X qglLoadIdentity();
 	qglOrtho( backEnd.viewParms.viewportX, backEnd.viewParms.viewportX + backEnd.viewParms.viewportWidth,
 			  backEnd.viewParms.viewportY, backEnd.viewParms.viewportY + backEnd.viewParms.viewportHeight,
 			  -99999, 99999 );

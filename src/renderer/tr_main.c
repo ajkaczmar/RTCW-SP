@@ -66,7 +66,7 @@ R_Fog (void)
 */
 void R_Fog( glfog_t *curfog ) {
 	static glfog_t setfog;
-
+	/*AKA-X
 	if ( !r_wolffog->integer ) {
 		R_FogOff();
 		return;
@@ -148,7 +148,7 @@ void R_Fog( glfog_t *curfog ) {
 	setfog.registered = qtrue;
 
 	qglClearColor( curfog->color[0], curfog->color[1], curfog->color[2], curfog->color[3] );
-
+	*/
 
 }
 
@@ -195,6 +195,7 @@ void R_FogOn( void ) {
 
 	qglEnable( GL_FOG );
 	fogIsOn = qtrue;
+
 }
 // done.
 

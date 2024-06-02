@@ -57,19 +57,19 @@ void GL_Bind( image_t *image ) {
 	}
 
 	if (image->imgName && strstr(image->imgName, "anatom")) {
-		int d;
-		d = 3;
+		int debug_hook;
+		debug_hook= 3;
 	}
 
 	if ( r_nobind->integer && tr.dlightImage ) {        // performance evaluation option
 		texnum = tr.dlightImage->texnum;
 	}
 
-	if ( glState.currenttextures[glState.currenttmu] != texnum ) {
+	//if ( glState.currenttextures[glState.currenttmu] != texnum ) {
 		if(image) image->frameUsed = tr.frameCount;
 		glState.currenttextures[glState.currenttmu] = texnum;
 		qglBindTexture( GL_TEXTURE_2D, texnum );
-	}
+	//}
 }
 
 /*
@@ -79,29 +79,30 @@ void GL_SelectTexture( int unit ) {
 	if (glState.currenttmu == unit) {
 		return;
 	}
-	//AKA-X
+	int cliAct = 0;
+	//AKA-X	
 
 	if ( unit == 0 ) {
 		qglActiveTextureARB( GL_TEXTURE0_ARB );
 		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE0_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE0_ARB );
+		if(cliAct) qglClientActiveTextureARB( GL_TEXTURE0_ARB );
 		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE0_ARB )\n" );
 	} else if ( unit == 1 )   {
 		qglActiveTextureARB( GL_TEXTURE1_ARB );
 		GLimp_LogComment( "glActiveTextureARB( GL_TEXTURE1_ARB )\n" );
-		qglClientActiveTextureARB( GL_TEXTURE1_ARB );
+		if (cliAct) qglClientActiveTextureARB( GL_TEXTURE1_ARB );
 		GLimp_LogComment( "glClientActiveTextureARB( GL_TEXTURE1_ARB )\n" );
 	}
 	else if (unit == 2) {
 		qglActiveTextureARB(GL_TEXTURE2_ARB);
 		GLimp_LogComment("glActiveTextureARB( GL_TEXTURE2_ARB )\n");
-		qglClientActiveTextureARB(GL_TEXTURE2_ARB);
+		if (cliAct) qglClientActiveTextureARB(GL_TEXTURE2_ARB);
 		GLimp_LogComment("glClientActiveTextureARB( GL_TEXTURE2_ARB )\n");
 	}
 	else if (unit == 3) {
 		qglActiveTextureARB(GL_TEXTURE3_ARB);
 		GLimp_LogComment("glActiveTextureARB( GL_TEXTURE3_ARB )\n");
-		qglClientActiveTextureARB(GL_TEXTURE3_ARB);
+		if (cliAct) qglClientActiveTextureARB(GL_TEXTURE3_ARB);
 		GLimp_LogComment("glClientActiveTextureARB( GL_TEXTURE3_ARB )\n");
 	} else {
 		ri.Error( ERR_DROP, "GL_SelectTexture: unit = %i", unit );
@@ -178,6 +179,8 @@ void GL_Cull( int cullType ) {
 ** GL_TexEnv
 */
 void GL_TexEnv( int env ) {
+	//AKA-X
+	return;	//AKA-X
 	if ( env == glState.texEnv[glState.currenttmu] ) {
 		return;
 	}
@@ -356,16 +359,16 @@ void GL_State( unsigned long stateBits ) {
 			qglDisable( GL_ALPHA_TEST );
 			break;
 		case GLS_ATEST_GT_0:
-			qglEnable( GL_ALPHA_TEST );
-			qglAlphaFunc( GL_GREATER, 0.0f );
+			//AKA-X qglEnable( GL_ALPHA_TEST );
+			//AKA-X qglAlphaFunc( GL_GREATER, 0.0f );
 			break;
 		case GLS_ATEST_LT_80:
-			qglEnable( GL_ALPHA_TEST );
-			qglAlphaFunc( GL_LESS, 0.5f );
+			//AKA-X qglEnable( GL_ALPHA_TEST );
+			//AKA-X qglAlphaFunc( GL_LESS, 0.5f );
 			break;
 		case GLS_ATEST_GE_80:
-			qglEnable( GL_ALPHA_TEST );
-			qglAlphaFunc( GL_GEQUAL, 0.5f );
+			//AKA-X qglEnable( GL_ALPHA_TEST );
+			//AKA-X qglAlphaFunc( GL_GEQUAL, 0.5f );
 			break;
 		default:
 			assert( 0 );
@@ -401,9 +404,9 @@ static void RB_Hyperspace( void ) {
 
 
 static void SetViewportAndScissor( void ) {
-	qglMatrixMode( GL_PROJECTION );
-	qglLoadMatrixf( backEnd.viewParms.projectionMatrix );
-	qglMatrixMode( GL_MODELVIEW );
+	//AKA-X qglMatrixMode( GL_PROJECTION );
+	//AKA-X qglLoadMatrixf( backEnd.viewParms.projectionMatrix );
+	//AKA-X qglMatrixMode( GL_MODELVIEW );
 
 	// set the window clipping
 	qglViewport(    backEnd.viewParms.viewportX,
@@ -571,7 +574,7 @@ void RB_BeginDrawingView( void ) {
 		plane2[2] = DotProduct( backEnd.viewParms.or.axis[2], plane );
 		plane2[3] = DotProduct( plane, backEnd.viewParms.or.origin ) - plane[3];
 
-		qglLoadMatrixf( s_flipMatrix );
+		//AKA-X qglLoadMatrixf( s_flipMatrix );
 		qglClipPlane( GL_CLIP_PLANE0, plane2 );
 		qglEnable( GL_CLIP_PLANE0 );
 	} else {
@@ -1041,7 +1044,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				R_TransformDlights( backEnd.refdef.num_dlights, backEnd.refdef.dlights, &backEnd.or );
 			}
 			//AKA tu ustawianie macierzy
-			qglLoadMatrixf( backEnd.or.modelMatrix );
+			//AKA-X  qglLoadMatrixf( backEnd.or.modelMatrix );
 
 			//
 			// change depthrange if needed
@@ -1164,7 +1167,7 @@ Used for cinematics.
 =============
 */
 void RE_StretchRaw( int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty ) {
-	/*AKX*/
+	/*AKA-X
 	int i, j;
 	int start, end;
 
@@ -1227,7 +1230,7 @@ void RE_StretchRaw( int x, int y, int w, int h, int cols, int rows, const byte *
 	qglVertex2f( x + w, y + h );
 	qglTexCoord2f( 0.5f / cols, ( rows - 0.5f ) / rows );
 	qglVertex2f( x, y + h );
-	qglEnd();
+	qglEnd();*/
 }
 
 
@@ -1491,8 +1494,8 @@ Also called by RE_EndRegistration
 void RB_ShowImages( void ) {
 	int i;
 
-
-
+	/*AKA-X
+	
 	image_t *image;
 	float x, y, w, h;
 	int start, end;
@@ -1540,7 +1543,7 @@ void RB_ShowImages( void ) {
 
 	end = ri.Milliseconds();
 	ri.Printf( PRINT_ALL, "%i msec to draw all images\n", end - start );
-
+	*/
 }
 
 

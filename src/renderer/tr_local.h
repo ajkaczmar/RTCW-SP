@@ -1063,6 +1063,10 @@ typedef struct {
 	GLint glsl_m_model;
 	GLint glsl_m_view;
 	GLint glsl_m_projection;
+
+	GLuint redProgram;
+	GLint red_m_view;
+	GLint red_m_projection;
 } trGlobals_t;
 
 extern backEndState_t backEnd;

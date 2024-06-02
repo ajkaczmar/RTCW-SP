@@ -755,8 +755,7 @@ void GL_SetDefaultState( void ) {
 	qglClearDepth( 1.0f );
 
 	qglCullFace( GL_FRONT );
-	/*AKX*/
-	qglColor4f( 1,1,1,1 );
+	//AKA-X qglColor4f( 1,1,1,1 );
 
 	// initialize downstream texture unit if we're running
 	// in a multitexture environment
@@ -771,16 +770,16 @@ void GL_SetDefaultState( void ) {
 	qglEnable( GL_TEXTURE_2D );
 	GL_TextureMode( r_textureMode->string );
 	//AKA-X 
-	GL_TexEnv( GL_MODULATE );
+	//AKA-X GL_TexEnv( GL_MODULATE );
 
 	//AKA-X 
-	qglShadeModel( GL_SMOOTH );
+	//AKA-X qglShadeModel( GL_SMOOTH );
 	qglDepthFunc( GL_LEQUAL );
 
 	// the vertex array is always enabled, but the color and texture
 	// arrays are enabled and disabled around the compiled vertex array call
 	//aka-x
-	qglEnableClientState( GL_VERTEX_ARRAY );
+	//AKA-X qglEnableClientState( GL_VERTEX_ARRAY );
 
 	//
 	// make sure our GL state vector is set correctly

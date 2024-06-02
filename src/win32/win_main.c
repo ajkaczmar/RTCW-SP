@@ -1283,6 +1283,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		return 0;
 	}
 
+	lpCmdLine = "loadgame xxx";
+
 	g_wv.hInstance = hInstance;
 	Q_strncpyz( sys_cmdline, lpCmdLine, sizeof( sys_cmdline ) );
 
