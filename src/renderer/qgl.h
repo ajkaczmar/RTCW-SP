@@ -98,6 +98,21 @@ If you have questions concerning this license or the applicable additional terms
 #define GL_TEXTURE2_ARB                     0x84C2
 #define GL_TEXTURE3_ARB                     0x84C3
 
+#define GL_TESS_EVALUATION_SHADER 0x8E87
+#define GL_TESS_CONTROL_SHADER 0x8E88
+#define GL_VERTEX_SHADER 0x8B31
+#define GL_FRAGMENT_SHADER 0x8B30
+#define GL_MAX_TESS_GEN_LEVEL 0x8E7E
+
+#define GL_PATCH_VERTICES 0x8E72
+
+#define GL_STATIC_DRAW 0x88E4
+#define GL_ELEMENT_ARRAY_BUFFER 0x8893
+#define GL_ARRAY_BUFFER 0x8892
+#define GL_PATCHES 0xE
+
+#define GL_INDEX_TYPE       GL_UNSIGNED_INT
+
 #define GL_COMPILE_STATUS 0x8B81
 #define GL_LINK_STATUS 0x8B82
 

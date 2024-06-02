@@ -221,7 +221,6 @@ static qboolean deferLoad;
 
 #define FILE_HASH_SIZE      4096
 
-#define GL_PATCH_VERTICES 0x8E72
 
 static shader_t*       hashTable[FILE_HASH_SIZE];
 
@@ -3519,15 +3518,7 @@ void checkCompileErrors(GLuint shader, char* type)
 		}
 	}
 }
-//qglGetShaderInfoLog
-//qglGetProgramInfoLog
-//qglGetProgramiv
 
-#define GL_TESS_EVALUATION_SHADER 0x8E87
-#define GL_TESS_CONTROL_SHADER 0x8E88
-#define GL_VERTEX_SHADER 0x8B31
-#define GL_FRAGMENT_SHADER 0x8B30
-#define GL_MAX_TESS_GEN_LEVEL 0x8E7E
 
 GLuint R_CompileTessShader() {
 	unsigned int vertex, fragment;

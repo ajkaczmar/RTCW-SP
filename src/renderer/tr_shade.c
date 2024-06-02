@@ -350,7 +350,6 @@ void RB_BeginSurface( shader_t *shader, int fogNum ) {
 	// done.
 }
 
-#define GL_PATCHES 0xE
 
 static void DrawGLSL_Tess(int stage, int vbo, int numIndexes) {
 
