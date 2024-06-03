@@ -1353,18 +1353,13 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input ) {
 		/* AKA tutaj rendering z lightmapa - jezeli nie wpadnie w flow z lightmap renderuje bez niej i dziala */
 		//
 		if (pStage->bundle[0].image[0] != 0 && strstr(pStage->bundle[0].image[0]->imgName, "anatom")) {
-
 			qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			/*DrawTesselated(input, stage);
-			*/
 			DrawGLSL(input, stage);
-
 			qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		} else if ( pStage->bundle[1].image[0] != 0 ) {
 
 			qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			DrawGLSL(input, stage); //DrawMultitextured( input, stage );
-
+			DrawGLSL(input, stage);
 			qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		} else
 		{
@@ -1855,7 +1850,11 @@ void RB_EndSurface( void ) {
 				qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 			else {
-				DrawGLSL_VBO(0, input->vbos[i], input->idxnum[i]);
+				qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				DrawGLSL_Tess(0, input->vbos[i], input->idxnum[i]);
+				qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			
+			//	DrawGLSL_VBO(0, input->vbos[i], input->idxnum[i]);
 			}
 		}
 		qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
