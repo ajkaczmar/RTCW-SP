@@ -1363,7 +1363,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input ) {
 			qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		} else
 		{
-			//return; //aka-x
+			return; //aka-x
 
 			int fadeStart, fadeEnd;
 
@@ -1850,9 +1850,10 @@ void RB_EndSurface( void ) {
 				qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 			else {
-				qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				DrawGLSL_Tess(0, input->vbos[i], input->idxnum[i]);
+				//qglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				DrawGLSL_Tess(0, input->vbos[i], input->idxnum[i]);
+				//qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			
 			//	DrawGLSL_VBO(0, input->vbos[i], input->idxnum[i]);
 			}

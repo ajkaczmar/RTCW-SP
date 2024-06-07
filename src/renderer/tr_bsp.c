@@ -429,7 +429,6 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int 
 	qglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	qglBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndexes * 3 * sizeof(int), &(((int*)((byte*)cv + cv->ofsIndices))[0]), GL_STATIC_DRAW);
 
-
 	unsigned int VBO;
 	qglGenBuffers(1, &VBO);
 
@@ -575,6 +574,31 @@ static void ParseTriSurf( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, i
 			ri.Error( ERR_DROP, "Bad index in triangle surface" );
 		}
 	}
+
+	unsigned int VAO;
+	qglGenVertexArrays(1, &VAO);
+	qglBindVertexArray(VAO);
+
+	unsigned int IBO;
+	qglGenBuffers(1, &IBO);
+	qglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	qglBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndexes * 3 * sizeof(int), &(tri->indexes[0]), GL_STATIC_DRAW);
+
+	unsigned int VBO;
+	qglGenBuffers(1, &VBO);
+
+	qglBindBuffer(GL_ARRAY_BUFFER, VBO);
+	qglBufferData(GL_ARRAY_BUFFER, numVerts * sizeof(drawVert_t), &(tri->verts[0].xyz[0]), GL_STATIC_DRAW);
+
+	qglBindBuffer(GL_ARRAY_BUFFER, VBO);
+	qglEnableVertexAttribArray(0);
+	qglVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(drawVert_t), (void*)0);
+	qglEnableVertexAttribArray(8);
+	qglVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(drawVert_t), (void*)(3 * sizeof(float)));
+	
+	tri->vboIdx = VAO;
+
+	qglBindVertexArray(0);
 }
 
 /*
@@ -1537,12 +1561,12 @@ static void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 	for ( i = 0 ; i < count ; i++, in++, out++ ) {
 		switch ( LittleLong( in->surfaceType ) ) {
 		case MST_PATCH:
-			//ParseMesh( in, dv, out );
-			//numMeshes++;
+			ParseMesh( in, dv, out );
+			numMeshes++;
 			break;
 		case MST_TRIANGLE_SOUP:
-			//ParseTriSurf( in, dv, out, indexes );
-			//numTriSurfs++;
+			ParseTriSurf( in, dv, out, indexes );
+			numTriSurfs++;
 			break;
 		case MST_PLANAR:
 			ParseFace( in, dv, out, indexes );

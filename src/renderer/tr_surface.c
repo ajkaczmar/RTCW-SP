@@ -350,6 +350,12 @@ void RB_SurfaceTriangles( srfTriangles_t *srf ) {
 	int dlightBits;
 	qboolean needsNormal;
 
+	tess.vbos[tess.numVBO] = srf->vboIdx;
+	tess.idxnum[tess.numVBO] = srf->numIndexes;
+	tess.numVBO++;
+	if (srf->vboIdx)
+		return;
+
 	dlightBits = srf->dlightBits[backEnd.smpFrame];
 	tess.dlightBits |= dlightBits;
 

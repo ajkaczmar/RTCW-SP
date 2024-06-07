@@ -620,7 +620,7 @@ typedef struct srfGridMesh_s {
 
 	// dynamic lighting information
 	int dlightBits[SMP_FRAMES];
-
+	int vboIdx;
 	// culling information
 	vec3_t meshBounds[2];
 	vec3_t localOrigin;
@@ -673,6 +673,7 @@ typedef struct {
 	vec3_t localOrigin;
 	float radius;
 
+	int vboIdx;
 	// triangle definitions
 	int numIndexes;
 	int             *indexes;

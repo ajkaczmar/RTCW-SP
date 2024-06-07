@@ -1211,9 +1211,9 @@ static void CG_DrawUpperRight( void ) {
 	if ( cg_drawSnapshot.integer ) {
 		y = CG_DrawSnapshot( y );
 	}
-	if ( cg_drawFPS.integer ) {
+	//akaif ( cg_drawFPS.integer ) {
 		y = CG_DrawFPS( y );
-	}
+	//}
 	if ( cg_drawTimer.integer ) {
 		y = CG_DrawTimer( y );
 	}
